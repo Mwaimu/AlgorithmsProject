@@ -1,17 +1,42 @@
 #include <iostream>
+#include <cstdlib>
+#include <vector>
+#include <ctime>
+
+#include <algorithm>  //random shuffle
+
+#include "Sensor.h"
+#include "Algorithm.h"
+
 using namespace std;
 
 //------- Global Variables -------//
 const int R = 5; //sensor radius
+const int LENGTH = 50; //length of the area that the sensors go in
+
 
 int main() {
+	srand(time(NULL));
+
+// ------- variable declarations ------- //
+	int numSensors;
+	vector<Sensor> S; //initialize empty vector
+
+	cout << "enter number of nodes to generate: ";
+		cin >> numSensors;
+
+		//makes "numSensors" Sensors and puts them into a vector
+		for(int i = 0; i < numSensors; i++) {
+			Sensor newSensor;
+			S.push_back(newSensor);
+		}
 
 	return 0;
 }
 
-greedySolution( S ) {  //will return A_t
+void greedySolution(vector<Sensor>& S) {  //will return A_t
 // ------- Definitions ------- //
-/*	s / A[i] = spcific sensor
+/*	s / A[i] = specific sensor
 		S = set of sensors
 		R = sensing radius
 		n = number of sensors
@@ -22,31 +47,36 @@ greedySolution( S ) {  //will return A_t
 				sensors also have to keep track of the number of rounds this lasts
 		**
 */
+	vector<Sensor> S_t;  //set of sensors alive at round t
+	vector<Sensor> A_t;  //set of sensors returned by algorithm at round t
+
 
 	S_t = S; //all sensors are alive in the beginning
-	rounds = 0;
-	while there are live sensors {
+	int rounds = 0;
+	while(S_t.size() != 0) {
 		rounds++;
-		A_t = null;//solution set for each iteration, output for every round
-		for (all sensors that are in S_t) {
-			if(S_t[i].energy == 0 ) //only gets taken out of S_t if power is depleted
-				take S_t[i] out of S_t
 
-			else if (S_t.size == 1 ){
-				add S_t[i] to A_t
-				S_t[i].power--
+		A_t.clear();  //solution set for each iteration to be output for every round, gets deleted so new elements can be added into it
+		for(int i = 0; i < S_t.size(); i++) {
+			if(S_t[i].getPower() == 0 ) //only gets taken out of S_t if power is depleted
+				S_t.erase(S_t.begin() + (i - 1) );  //take S_t[i] out of S_t
+					//starts at beginning and goes to the ith place in the vector and takes out that place
+
+			else if (S_t.size() == 1 ){
+				A_t.push_back(S_t[i]);  //add S_t[i] to A_t
+				S_t[i].setPower(S_t[i].getPower() - 1);
 			}
 
-			else( !isRedundantMK3() )  //if not redundant add to solution
-				add S_t[i] to A_t
-				S_t[i].power-- //subtract power
+			else if( !isRedundantMK3(S_t[i], A_t) )  //if not redundant add to solution
+				A_t.push_back(S_t[i]);  //add S_t[i] to A_t
+				S_t[i].setPower(S_t[i].getPower() - 1);
 
-			//else is redundant, don't add to A_t, basically skip to the next sensor
+		//else is redundant, don't add to A_t, basically skip to the next sensor
 		}
 	}
 }
 
-bool isRedundantMK3(s, A_t){
+bool isRedundantMK3(Sensor s, vector<Sensor>& A_t){
 //Has to have at least 2 sensors in A_t
 /* ------- Definitions ------- //
 	IP = intersection Point
@@ -55,29 +85,34 @@ bool isRedundantMK3(s, A_t){
 	s = current sensor looking at from S_t
 */
 
-	for( all sensors in A_t) {
-		if( distBet(A_t[i], s) < 2R) //if q is in range of s
-			put A_t[i] in QsensorsArray	//put sensor in array
+	vector<Sensor> qSensors;
+	vector<Sensor> ipTest;
+
+	for(int i = 0; i < A_t.size(); i++) {
+		if(distBet(A_t[i], s) < 2R)
+			qSensors.push_back(A_t[i]);  //put A_t[i] in qSensors
 	}
 
-	for( i = 0 -> QsensorsArray.size-2) {
-		for( j = i+1 ) {
+	for(int i = 0; i < qSensors.size() - 2; i++) {
+		for(int j = i + 1; j < qSensors.size(); i++) {   //THINK ABOUT THIS
 			if(i == j)
-				//skip, because same sensor
-			else if(distBet( Q[i], Q[j] ) < 2R) {
+				i = i;  //skip, because same sensor
+			else if(distBet( qSensors[i], qSensors[j] ) < 2R) {
+				i = i;
 				makes IP
-					//find location using Q[i] & distance tracker from wateringgrass prob
-				if( IP in radius of s)
-					put IP in testArray  //array to be thrown into rest of redundancy
+				//find location using Q[i] & distance tracker from wateringgrass prob
+			if(distBet(IP, s) < R)  // IP in radius of s
+				qSensors.push_back(A_t[i]);  //put IP in testArray
 			}
 		}
 	}
 
-	for( each IP point in testArray ) {
-		count = 0; //resets count
-		for ( each q ) { //for each sensor in A_t
-			if( distBet( q, IP ) < R  )//means IP still redundant
-			 	count++;
+	for(int i = 0; i < ipTest.size(); i++) { //for each IP point -> i
+		int count = 0; //resets count
+
+		for (int j = 0; j < A_t.size(); j++) { //for each sensor in A_t -> j
+			if( distBet( A_t[j], ipTest[i] ) < R  )//means IP still redundant
+				count++;
 		} //for each q
 		if( count == 0)  //means IP NEVER covered
 			return false; //means needed -> b/c there's one point never covered
@@ -86,10 +121,10 @@ bool isRedundantMK3(s, A_t){
 }
 
 //finds the distance between two points
-int distBet(sensor cur, sensor prev) {
+int distBet(Sensor cur, Sensor prev) {
 	//might have to cast these (inside sqrt) as a float just to make sure
 	//there are no rounding errors beforehand
-	return absVal( sqrt( (cur.x - prev.x)^2 + (cur.y - prev.y)^2 ) );
+	return abs( sqrt( (cur.getX() - prev.getX())^2 + (cur.getY() - prev.getY())^2 ) );
 	//this also needs to be ABSOLUTE VALUE
 }
 
@@ -97,13 +132,16 @@ int distBet(sensor cur, sensor prev) {
 //OTHER APPROACHES:
 
 //1
-allActive(S){ //for (each round t) decrement energy when tested for duration
-	A_t = S;//the solution is all sensors in A
-	round = 0;
-	for (all the sensors in A)
-		A_t[i].power--
-		round++
-	return A_t;
+void allActive(vector<Sensor> S){ //for (each round t) decrement energy when tested for duration
+	vector<Sensor> A_t = S;//the solution is all sensors in A
+	int round = 0;
+	for(int i = 0; i < A_t.size(); i++)
+		A_t[i].setPower(A_t[i].getPower() -1);
+
+	round++;
+	need to output rounds and vectors
+
+	return;
 }
 
 //2
