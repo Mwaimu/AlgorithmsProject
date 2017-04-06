@@ -174,7 +174,6 @@ that are currently not covered by the sensor in A.
 	}
 }
 
-//3
 topDown(S) {
 /*	This algorithm starts from a set of active sensors A equal to the set of
 		alive sensors S_t. It iteratively picks at random a sensor s in A.
@@ -182,25 +181,35 @@ topDown(S) {
 
  ------- Definitions ------- //
 	S_t = set of sensors that are alive
-	A = set of sensors to output for that round
+	A_t = set of sensors to output for that round
 	A[i].randCheck = bool inside each sensor that checks if that sensor has been
 	checked n = number in A
 */
-	S_t = S //start off with a full set
-	while( S_t is not null ) {
-		A = S_t  //copy constructor probably
-		//creates an array that has all numbers 0 through n-1 in random order
-		arrRand[n] = random[0 -> n];
+	vector <sensor> S_t;//set of sensors that are alive
+	vector <sensor> A_t;//set of sensors to output for that round
+	S_t = S; //start off with a full set
 
-		for(i = each item in A) {
-			j = arrRand[i];	//makes j the random number in the Ith location of arrj
-			if(A[j].power == 0)  //if no power, remove A[j] from S_t
-				remove A[j] from S_t;
+	while( S_t != NULL){
+		A_t = S_t; //copy constructor S_t with A_t
+
+		random_shuffle(A_t.begin(), A_t.end());//puts sensors in a random order
+
+		z = S.size();
+
+		for(i = 0; i < z; i++) {
+			if(A_t[i].power == 0){  //if no power
+				for(j = 0; j < z; j++){
+					if (A_t[i] = S_t[j]){
+						S_t.erase(S_t.begin() + j);// remove A[i] from S_t
+					}
+				}
+
+			}
 			else {
-				if(A[j] is redundant)
-					remove from A
-				else
-					A[j].power--;
+				if(A_t[i].isRedundantMK3())
+					//remove from A_t
+					else
+				A_t[i].power--;
 			}
 		}
 	}
