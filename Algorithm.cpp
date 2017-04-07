@@ -136,7 +136,7 @@ void allActive(vector<Sensor> S){ //for (each round t) decrement energy when tes
 	vector<Sensor> A_t = S;//the solution is all sensors in A
 	int round = 0;
 	for(int i = 0; i < A_t.size(); i++)
-		A_t[i].setPower(A_t[i].getPower() -1);
+		A_t[i].setPower(A_t[i].getPower() - 1);
 
 	round++;
 	need to output rounds and vectors
@@ -145,36 +145,51 @@ void allActive(vector<Sensor> S){ //for (each round t) decrement energy when tes
 }
 
 //2
-bottomUp(S){
+void bottomUp(vector<Sensor> S){
 /*Random-bottom-up: This algorithm starts from an empty set of active sensors A.
 It iteratively selects a sensor s among those that are alive to be added to A.
 The sensor s is added to A only if the sensor covers some intersection points
 that are currently not covered by the sensor in A.
 */
 
-	S_t = S;
-	while (S_t != NULL) // while there are live sensors
+  vector<Sensor> S_t = S;
+  vector<Sensor> A_t;
+	while (S_t.size() != 0) // while there are live sensors
 	{
-		A = NULL
-		arrRand[n] = random[0 -> n-1] //array of random numberes 0-n-1 all included
+    A_t.clear();  //solution set for each iteration to be output for every round, gets deleted so new elements can be added into it
+    random_shuffle(A_t.begin(), A_t.end());//puts sensors in a random order
 
-		for (i = each item in S_t)
-			j = arrRand[i] // j = rand num @ iteration i of arrRand
-		if (if S_t[j].power == 0)
-			remove from S_t // if no power remove
-		else if (S_t.size == 1 ){
-			add S_t[i] to A_t
-			S_t[i].power--
-		}
-		else
-			if (S_t !isRedundantMK3){
-				S_t.power--
-				A = A (union) S_t[i]
-			}
+		for (int i = 0; i < A_t.size(); i++){
+      //			j = arrRand[i] // j = rand num @ iteration i of arrRand
+      if( A_t[i].getPower() == 0) {
+        i=i //just to skip stiff
+
+
+/*  this won't work because we are trying to erase a Sensor from S_t with the index of an A_t sensor that has been
+    randomized rendering the index given to the erase function (erasing from S_t) not the actual one that we want to
+    get rid of.
+
+    so basically we are going to have to write a function to make sure that when we delete and or add something that we have the right sensor
+      something that will find the sensor out of S_t to be deleted??
+*/
+        remove from S_t // if no power remove
+      }
+      else if (S_t.size() == 1 ){
+//????? this won't work because we are trying to add a Sensor from S_t with the index of an A_t sensor that has been
+//????? randomized rendering the index given to the add function not the actual one that we want to get rid of.
+        add S_t[i] to A_t
+        S_t[i].setPower(S_t[i].getPower() - 1);
+      }
+      else if( !isRedundantMK3(A_t[i], A_t) ) {
+        S_t[i].setPower(S_t[i].getPower() - 1);
+        add S_t[i] to A_t
+      }
+    }
+
 	}
 }
 
-topDown(S) {
+void topDown(vector<Sensor> S) {
 /*	This algorithm starts from a set of active sensors A equal to the set of
 		alive sensors S_t. It iteratively picks at random a sensor s in A.
 		The sensor is removed from A if it is redundant (w.r.t. the sensors in A).
@@ -185,31 +200,38 @@ topDown(S) {
 	A[i].randCheck = bool inside each sensor that checks if that sensor has been
 	checked n = number in A
 */
-	vector <sensor> S_t;//set of sensors that are alive
-	vector <sensor> A_t;//set of sensors to output for that round
+	vector<Sensor> S_t;//set of sensors that are alive
+	vector<Sensor> A_t;//set of sensors to output for that round
 	S_t = S; //start off with a full set
 
-	while( S_t != NULL){
-		A_t = S_t; //copy constructor S_t with A_t
+	while(S_t.size() != 0){
+		A_t = S_t; //copy constructor S_t with A_t??
 
 		random_shuffle(A_t.begin(), A_t.end());//puts sensors in a random order
 
-		z = S.size();
+//???  Should this be S_t.size()  ????
+		int z = S.size();
 
-		for(i = 0; i < z; i++) {
-			if(A_t[i].power == 0){  //if no power
-				for(j = 0; j < z; j++){
-					if (A_t[i] = S_t[j]){
+		for(int i = 0; i < z; i++) {
+			if(A_t[i].getPower() == 0){  //if no power
+				for(int j = 0; j < z; j++){
+
+//???? gotta probably have to overload the == operator to check that two sensors are equal	????
+					if (A_t[i] == S_t[j]){
+
+//????? this won't work because we are trying to erase a Sensor from S_t with the index of an A_t sensor that has been
+//????? randomized rendering the index given to the erase function not the actual one that we want to get rid of.
 						S_t.erase(S_t.begin() + j);// remove A[i] from S_t
 					}
 				}
 
 			}
 			else {
-				if(A_t[i].isRedundantMK3())
+				if( isRedundantMK3(A_t[i], A_t) )
+          z = S.size();
 					//remove from A_t
-					else
-				A_t[i].power--;
+        else
+				  A_t[i].setPower(A_t[i].getPower() - 1);
 			}
 		}
 	}
