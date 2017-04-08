@@ -15,6 +15,7 @@ const int R = 5; //sensor radius
 const int LENGTH = 50; //length of the area that the sensors go in
 
 
+
 int main() {
 	srand(time(NULL));
 
@@ -30,6 +31,20 @@ int main() {
 			Sensor newSensor;
 			S.push_back(newSensor);
 		}
+
+  cout << "Greedy Solution" << endl;
+  greedySolution(S);
+
+  cout << "All Active" << endl;
+  allActive(S);
+
+  cout << "Bottom Up" << endl;
+  bottomUp(S);
+
+  cout << "Top Down" << endl;
+  topDown(S);
+
+
 
 	return 0;
 }
@@ -47,6 +62,8 @@ void greedySolution(vector<Sensor>& S) {  //will return A_t
 				sensors also have to keep track of the number of rounds this lasts
 		**
 */
+  int twoR = 2 * R;
+
 	vector<Sensor> S_t;  //set of sensors alive at round t
 	vector<Sensor> A_t;  //set of sensors returned by algorithm at round t
 
@@ -67,7 +84,7 @@ void greedySolution(vector<Sensor>& S) {  //will return A_t
 				S_t[i].setPower(S_t[i].getPower() - 1);
 			}
 
-			else if( !isRedundantMK3(S_t[i], A_t) )  //if not redundant add to solution
+			else if( !isRedundantMK3(S_t[i], A_t, S_t) )  //if not redundant add to solution
 				A_t.push_back(S_t[i]);  //add S_t[i] to A_t
 				S_t[i].setPower(S_t[i].getPower() - 1);
 
@@ -76,7 +93,7 @@ void greedySolution(vector<Sensor>& S) {  //will return A_t
 	}
 }
 
-bool isRedundantMK3(Sensor s, vector<Sensor>& A_t){
+bool isRedundantMK3(Sensor s, vector<Sensor>& A_t, vector<Sensor>& S_t){
 //Has to have at least 2 sensors in A_t
 /* ------- Definitions ------- //
 	IP = intersection Point
@@ -84,12 +101,17 @@ bool isRedundantMK3(Sensor s, vector<Sensor>& A_t){
   A_t = set of non-redundant sensors (to be output)
 	s = current sensor looking at from S_t
 */
+	if (S_t.size() == 1 ) {
+		return false;
+	}
+
+  int twoR = 2 * R;
 
 	vector<Sensor> qSensors;
 	vector<Sensor> ipTest;
 
 	for(int i = 0; i < A_t.size(); i++) {
-		if(distBet(A_t[i], s) < 2R)
+		if(distBet(A_t[i], s) < twoR)
 			qSensors.push_back(A_t[i]);  //put A_t[i] in qSensors
 	}
 
@@ -97,7 +119,7 @@ bool isRedundantMK3(Sensor s, vector<Sensor>& A_t){
 		for(int j = i + 1; j < qSensors.size(); i++) {   //THINK ABOUT THIS
 			if(i == j)
 				i = i;  //skip, because same sensor
-			else if(distBet( qSensors[i], qSensors[j] ) < 2R) {
+			else if(distBet( qSensors[i], qSensors[j] ) < twoR) {
 				i = i;
 				makes IP
 				//find location using Q[i] & distance tracker from wateringgrass prob
@@ -135,12 +157,17 @@ int distBet(Sensor cur, Sensor prev) {
 void allActive(vector<Sensor> S){ //for (each round t) decrement energy when tested for duration
 	vector<Sensor> A_t = S;//the solution is all sensors in A
 	int round = 0;
-	for(int i = 0; i < A_t.size(); i++)
-		A_t[i].setPower(A_t[i].getPower() - 1);
+  while(A_t.size() != 0) {
+    for(int i = 0; i < A_t.size(); i++) //for all elements in A_t
+      if(A_t[i].getPower() != 0) //if still power
+        A_t[i].setPower(A_t[i].getPower() - 1); //decrease power
+      else
+        //remove from A_t
 
-	round++;
-	need to output rounds and vectors
-
+    round++;
+    cout << "Round: " << round << endl;
+    printVect(A_t);  //prints what's in A_t
+  }
 	return;
 }
 
@@ -162,7 +189,7 @@ that are currently not covered by the sensor in A.
 		for (int i = 0; i < A_t.size(); i++){
       //			j = arrRand[i] // j = rand num @ iteration i of arrRand
       if( A_t[i].getPower() == 0) {
-        i=i //just to skip stiff
+        i=i; //just to skip stiff
 
 
 /*  this won't work because we are trying to erase a Sensor from S_t with the index of an A_t sensor that has been
@@ -174,15 +201,9 @@ that are currently not covered by the sensor in A.
 */
         remove from S_t // if no power remove
       }
-      else if (S_t.size() == 1 ){
-//????? this won't work because we are trying to add a Sensor from S_t with the index of an A_t sensor that has been
-//????? randomized rendering the index given to the add function not the actual one that we want to get rid of.
-        add S_t[i] to A_t
+      else if( !isRedundantMK3(A_t[i], A_t, S_t) ) {
+        A_t.push_back(S_t[i]); //add S_t[i] to A_t
         S_t[i].setPower(S_t[i].getPower() - 1);
-      }
-      else if( !isRedundantMK3(A_t[i], A_t) ) {
-        S_t[i].setPower(S_t[i].getPower() - 1);
-        add S_t[i] to A_t
       }
     }
 
@@ -215,9 +236,7 @@ void topDown(vector<Sensor> S) {
 		for(int i = 0; i < z; i++) {
 			if(A_t[i].getPower() == 0){  //if no power
 				for(int j = 0; j < z; j++){
-
-//???? gotta probably have to overload the == operator to check that two sensors are equal	????
-					if (A_t[i] == S_t[j]){
+					if( isEqual(A_t[i], S_t[j]) ){
 
 //????? this won't work because we are trying to erase a Sensor from S_t with the index of an A_t sensor that has been
 //????? randomized rendering the index given to the erase function not the actual one that we want to get rid of.
@@ -227,7 +246,8 @@ void topDown(vector<Sensor> S) {
 
 			}
 			else {
-				if( isRedundantMK3(A_t[i], A_t) )
+				if( isRedundantMK3(A_t[i], A_t, S_t) )
+//?????? I don't understand what's going on here
           z = S.size();
 					//remove from A_t
         else
@@ -235,5 +255,12 @@ void topDown(vector<Sensor> S) {
 			}
 		}
 	}
+}
+
+bool isEqual(Sensor first, Sensor second) {
+  if(first.getX() == second.getX() && first.getY() == second.getY() && first.getPower() == second.getPower())
+    return true;
+  else
+    return false;
 }
 //end

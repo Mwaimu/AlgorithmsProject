@@ -17,7 +17,11 @@ using namespace std;
 class Sensor {
 public:
 
-	Sensor();
+  //copy constructor for vectors
+//  I have one made from a different class I'll pull it up later
+
+
+  Sensor(); //constructor
 
 	int getPower() { return power; }
 	int getX() { return x; }
