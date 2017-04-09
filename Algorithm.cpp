@@ -101,8 +101,11 @@ bool isRedundantMK3(Sensor s, vector<Sensor>& A_t, vector<Sensor>& S_t){
   A_t = set of non-redundant sensors (to be output)
 	s = current sensor looking at from S_t
 */
-	if (S_t.size() == 1 ) {
+	if(S_t.size() == 1 ) {
 		return false;
+	}
+	if(s.getPower() == 0) {
+		return true;
 	}
 
   int twoR = 2 * R;
@@ -184,22 +187,11 @@ that are currently not covered by the sensor in A.
 	while (S_t.size() != 0) // while there are live sensors
 	{
     A_t.clear();  //solution set for each iteration to be output for every round, gets deleted so new elements can be added into it
-    random_shuffle(A_t.begin(), A_t.end());//puts sensors in a random order
+    random_shuffle(S_t.begin(), S_t.end());//puts sensors in a random order
 
-		for (int i = 0; i < A_t.size(); i++){
-      //			j = arrRand[i] // j = rand num @ iteration i of arrRand
-      if( A_t[i].getPower() == 0) {
-        i=i; //just to skip stiff
-
-
-/*  this won't work because we are trying to erase a Sensor from S_t with the index of an A_t sensor that has been
-    randomized rendering the index given to the erase function (erasing from S_t) not the actual one that we want to
-    get rid of.
-
-    so basically we are going to have to write a function to make sure that when we delete and or add something that we have the right sensor
-      something that will find the sensor out of S_t to be deleted??
-*/
-        remove from S_t // if no power remove
+		for (int i = 0; i < S_t.size(); i++){
+      if( S_t[i].getPower() == 0) {
+				S_t.erase(S_t.begin() + i);  //remove from S_t, no power
       }
       else if( !isRedundantMK3(A_t[i], A_t, S_t) ) {
         A_t.push_back(S_t[i]); //add S_t[i] to A_t
@@ -224,36 +216,45 @@ void topDown(vector<Sensor> S) {
 	vector<Sensor> S_t;//set of sensors that are alive
 	vector<Sensor> A_t;//set of sensors to output for that round
 	S_t = S; //start off with a full set
+	int round = 0;
 
 	while(S_t.size() != 0){
-		A_t = S_t; //copy constructor S_t with A_t??
+		A_t = S_t; //reset A_t to everything alive
 
 		random_shuffle(A_t.begin(), A_t.end());//puts sensors in a random order
 
-//???  Should this be S_t.size()  ????
-		int z = S.size();
-
-		for(int i = 0; i < z; i++) {
+		for(int i = 0; i < A_t.size(); i++) {
 			if(A_t[i].getPower() == 0){  //if no power
-				for(int j = 0; j < z; j++){
+				//compare against everything in S_t to find match
+				for(int j = 0; j < S_t.size(); j++){
+					//when match is found, delete
 					if( isEqual(A_t[i], S_t[j]) ){
+						S_t.erase(S_t.begin() + j);// remove A_t[i] from S_t
 
-//????? this won't work because we are trying to erase a Sensor from S_t with the index of an A_t sensor that has been
-//????? randomized rendering the index given to the erase function not the actual one that we want to get rid of.
-						S_t.erase(S_t.begin() + j);// remove A[i] from S_t
 					}
 				}
-
 			}
+				//it has power left
 			else {
-				if( isRedundantMK3(A_t[i], A_t, S_t) )
-//?????? I don't understand what's going on here
-          z = S.size();
-					//remove from A_t
+				if( isRedundantMK3(A_t[i], A_t, S_t) ) {
+					//and is redundant, remove it from A_t
+					A_t.erase(A_t.begin() + i);// remove A_t[i] from A_t
+				}
+				//happens when still needed
         else
-				  A_t[i].setPower(A_t[i].getPower() - 1);
+
+					for(int j = 0; j < S_t.size(); j++){
+						//when match is found, delete
+						if( isEqual(A_t[i], S_t[j]) ){
+							S_t[i].setPower(S_t[i].getPower() - 1);
+						}
+					}
+				  A_t[i].setPower(A_t[i].getPower() - 1); //really only needed if we output the power along with each sensor
 			}
 		}
+		round++;
+		cout << "Round: " << round << endl;
+		printVect(A_t);
 	}
 }
 

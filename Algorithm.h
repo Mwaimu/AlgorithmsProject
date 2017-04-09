@@ -35,4 +35,5 @@ bool isEqual(Sensor first, Sensor second);
 //prints out the sensors from the vector parameter
 void printVect(vector<Sensor> vect);
 
+
 #endif //FOLDER_ALGORITHM_H
