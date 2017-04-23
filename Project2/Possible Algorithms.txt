@@ -1,0 +1,60 @@
+Nathan Welch
+Algorithms Project 2
+
+/* ------- Definitions ------- //
+  kEdges = edges one level under S and above D
+
+*/
+
+staticAttackStrategy() {  //assuming we are to recalculate the flow at each iteration
+  run code to find paths //done once
+  while flow to D OR flow from S is not zero {
+    find edge with most flow through it and delete that edge
+    delete all paths associated with deleted edge from list of paths
+    recalculate flow through paths
+  }
+}
+
+staticAttackStrategy() {  //assuming we are NOT to recalculate the flow at each iteration
+  run DFS code to find paths
+  rel_S = relevant edges from S //if there is a kEdge pointing to another kEdge, the first is irrelevant
+  rel_D = relevant edges from D
+  if(rel_D > rel_S) {
+    for(each edge in rel_S)
+      delete rel_S edge that has the highest flow
+  }
+  else {
+    for(each edge in rel_D)
+      delete rel_D edge that has the highest flow
+  }
+
+  OR
+
+  while(flow not zero) {
+    find path (to D or from S) that will take out the most flow
+    //taking out from one side could knock out multiple edges from the other
+    remove that path
+  }
+}
+
+//attack happens then recalculate flow
+activeAttackStrategy() {
+  run DFS code to find paths
+  maxFlow = run Ford_Fulkerson(G, tempCounter) to find maxFlow
+    pass tempCounter<int>(remembers edge ID) variable into FFA that keeps track of the edge that has the highest flow
+    if multiple of same flow, just remembers first
+  while(maxFlow != 0) {
+    attack link that will reduce the maxFlow the most
+      this is the edge that after running FFA has the most flow running though it
+      maxFlow = run Ford_Fulkerson(G, tempCounter) again
+  }
+}
+
+//assuming flow is recalculated after each attack
+randomAttackStrategy() {
+  while(flow) {
+    pick random edge
+    delete edge picked
+    recalculate flow (run FFA)
+  }
+}
