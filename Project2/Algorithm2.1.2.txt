@@ -1,0 +1,60 @@
+StaticAttack() {
+	flow = Ford_Fulkerson(G_i);    //this gets paths and the value of the maxflow
+	while flow not zero {
+		edge = link with most flow
+		delete edge
+		takes possible paths out of G_i
+	}
+return;
+}
+
+StaticRandomAttack() {
+  flow = Ford_Fulkerson(G_i);
+  while flow not zero {
+    edge = random link
+    delete edge
+		takes possible paths out of G_i
+  }
+  return;
+}
+
+ReactiveAttack(Network G_i) {
+  flow = Ford_Fulkerson(G_i);
+  while flow not zero {
+    edge = link with most flow
+    delete edge
+		takes possible paths out of G_i
+		flow = Ford_Fulkerson(G_i);  //make something in FFA that keeps track of the link that has the max flow running through it
+  }
+  return;
+}
+
+ReactiveRandomAttack() {
+	flow = Ford_Fulkerson(G_i);
+  while flow not zero {
+    edge = random link
+    delete edge
+		takes possible paths out of G_i
+		flow = Ford_Fulkerson(G_i);  //make something in FFA that keeps track of the link that has the max flow running through it
+  }
+  return;
+}
+
+pair<int, edge> Ford_Fulkerson() {
+	for each edge in E {
+		set flow to zero
+	}
+	calculate residual network G_f
+	while(go through each path in G_f) {
+		select augmenting path p in G_f
+		cf_p = minumum capacity along that path
+		for(each edge in p) {
+			if(edge is in E)
+				edge.flow = edge.flow + cf_p
+			else
+				oppEdge.flow = oppEdge.flow - cf_p;
+		}
+		calculate G_f
+	}
+	return (outputFlow - inputFlow, edgeWithMaxFlow);
+}
