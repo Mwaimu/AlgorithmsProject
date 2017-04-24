@@ -3,20 +3,38 @@ Algorithms Project 2
 
 /* ------- Definitions ------- //
   kEdges = edges one level under S and above D
-
+  G_i is the flow network -> can be passed in instead of having to be calculated in each function.
+  S and D are the source and destination nodes. The connections to/from these nodes can not be deleted
 */
 
-staticAttackStrategy() {  //assuming we are to recalculate the flow at each iteration
-  run code to find paths //done once
+main() {
+  parse data from file into a LIST of stuffs //http://www.topology-zoo.org/files/Kdl.gml
+    -> this makes our Network(graph) G
+
+  add in S and D
+  make K connections
+  take data from G and run it through pathFinder algoritm //http://www.geeksforgeeks.org/find-paths-given-source-destination/
+    -> this gives us Network G_i
+
+  staticAttackStrategy(G_i);
+
+  reactiveAttackStrategy(G_i);
+
+  randomAttackStrategy(G_i);
+
+  return 0;
+}
+staticAttackStrategy(Network G_i) {  //assuming we are to recalculate the flow at each iteration
   while flow to D OR flow from S is not zero {
     find edge with most flow through it and delete that edge
-    delete all paths associated with deleted edge from list of paths
-    recalculate flow through paths
+    if found edge is NOT a kEdge {
+      delete all paths associated with deleted edge from list of paths
+      recalculate flow through paths
+    }
   }
 }
 
-staticAttackStrategy() {  //assuming we are NOT to recalculate the flow at each iteration
-  run DFS code to find paths
+staticAttackStrategy(Network G_i) {  //assuming we are NOT to recalculate the flow at each iteration
   rel_S = relevant edges from S //if there is a kEdge pointing to another kEdge, the first is irrelevant
   rel_D = relevant edges from D
   if(rel_D > rel_S) {
@@ -38,7 +56,7 @@ staticAttackStrategy() {  //assuming we are NOT to recalculate the flow at each 
 }
 
 //attack happens then recalculate flow
-activeAttackStrategy() {
+reactiveAttackStrategy(Network G_i) {
   run DFS code to find paths
   maxFlow = run Ford_Fulkerson(G, tempCounter) to find maxFlow
     pass tempCounter<int>(remembers edge ID) variable into FFA that keeps track of the edge that has the highest flow
@@ -51,10 +69,26 @@ activeAttackStrategy() {
 }
 
 //assuming flow is recalculated after each attack
-randomAttackStrategy() {
+randomAttackStrategy(Network G_i) {
   while(flow) {
     pick random edge
     delete edge picked
     recalculate flow (run FFA)
   }
 }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+//just here cause I like spaces at the end...
