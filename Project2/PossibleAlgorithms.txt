@@ -77,6 +77,26 @@ randomAttackStrategy(Network G_i) {
   }
 }
 
+Graphs in the final report to be made
+1) flow over time
+  Line graph
+  x-axis -> time
+   y-axis -> flow @ time
+
+  This shoud be as steep as possible
+
+2) Time at which 50% original flow is disrupted
+  Histogram, 3 bars
+  x-axis -> strategy
+  y-axis -> rounds till @ 50%
+  want a lower number
+
+3) Impact of K
+  run the whole thing with K(1->30) and compare how K effects the number of rounds it takes to get to zero
+  x-axis -> value of K
+  y-axis -> rounds needed to get flow to zero
+  want a lower number
+
 
 
 
