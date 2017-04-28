@@ -14,7 +14,7 @@ Node::Node() {
 }
 
 void Node::setParent(Node p) {
-	parent = p;
+	*parent = p;
 }
 
 void Node::setVisited(bool v) {

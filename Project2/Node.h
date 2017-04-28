@@ -24,7 +24,7 @@ public:
 private:
   int id;
 	bool visited;
-	Node parent;
+	Node* parent; //this is somehow going to have to be a pointer
 	vector<Node> adjList;
 
 };
