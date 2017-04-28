@@ -5,21 +5,25 @@
 #ifndef ALGORITHMS_EDGE_H
 #define ALGORITHMS_EDGE_H
 
+#include <vector>
 #include <iostream>
 #include <cstdlib>
 
-#include "Edge.h"
-#include "Node.h"
-#include "Network.h"
 
 using namespace std;
 
 
 class Edge {
 public:
-  Edge(int s, int d);
+  Edge();
+	Edge(int s, int d);
 
   void printEdge();
+	void setSource(int s);
+	void setDest(int d);
+	void setFlow(int f);
+	void setCapacity(int c);
+	void addEdge(int s, int d);
 
   int getSource() { return source; }
   int getDest() { return dest; }

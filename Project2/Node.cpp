@@ -6,4 +6,17 @@
 
 Node::Node(int i) {
   id = i;
+	parent = nullptr;
+}
+
+Node::Node() {
+	parent = nullptr;
+}
+
+void Node::setParent(Node* p) {
+	parent = p;
+}
+
+void Node::setVisited(bool v) {
+	visited = v;
 }

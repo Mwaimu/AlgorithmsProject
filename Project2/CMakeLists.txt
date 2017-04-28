@@ -3,5 +3,5 @@ project(Algorithms)
 
 set(CMAKE_CXX_STANDARD 11)
 
-set(SOURCE_FILES Edge.cpp Edge.h Node.cpp Node.h Network.cpp Network.h main.cpp main.h)
+set(SOURCE_FILES main.cpp main.h Edge.cpp Edge.h Network.cpp Network.h Node.cpp Node.h)
 add_executable(lockThing ${SOURCE_FILES})
