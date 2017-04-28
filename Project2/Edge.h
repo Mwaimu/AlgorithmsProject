@@ -17,14 +17,13 @@ using namespace std;
 
 class Edge {
 public:
-  Edge();
+//  Edge();
 	Edge(Node s, Node d);
 
   void printEdge();
 	void setSource(Node s);
 	void setDest(Node d);
 	void setFlow(int f);
-	void addEdge(int s, int d);
 
   Node getSource() { return source; }
   Node getDest() { return dest; }

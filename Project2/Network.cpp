@@ -11,42 +11,19 @@ Network::Network() {
 
 void Network::printNetwork() {
 	//for every edge in the network print it's edges
+  cout << "Edges" << endl;
   for(Edge edge : edgeVec) {
     edge.printEdge();
     cout << endl;
   }
+  cout << "Nodes" << endl;
 	//for every node in the network print the nodes
   for(Node node : nodeVec) {
     cout << node.getID() << endl;
   }
 }
 
-void Network::modFFA(Network N) {
-	//set all edge.flow values to zero
-  for(Edge e: N.edgeVec) {
-    e.setFlow(0);
-  }
-	N.DFS();
 
-
-//		calculate residual network G_f -> stored as a set
-//		while(go through each path in G_f) {
-//			select augmenting path p in G_f
-//			cf_p = minimum capacity along that path
-//			for(each edge in p) {
-//				if(edge is in E)
-//				edge.flow = edge.flow + cf_p
-//				else
-//				oppEdge.flow = oppEdge.flow - cf_p;
-//			}
-//			calculate G_f
-//		}
-//		return (outputFlow - inputFlow, set of Edges);
-
-
-
-
-	}
 
 void Network::addEdge(Edge e) {
 	edgeVec.push_back(e);
@@ -64,11 +41,9 @@ vector<Node> Network::getNodeVect() {
 	return nodeVec;
 }
 
-void Network::DFS() {
-	Network N; // need to set this to the calling thing
+void Network::DFS(Network N) {
 	//for each of the nodes in the network, set the parents to null and the visit to false
 	for(Node node: N.getNodeVect()) {
-		node.setParent(nullptr);
 		node.setVisited(false);
 	}
 	//for each of the nodes in the network, (only happens once with a directed graph)   \
@@ -81,38 +56,25 @@ void Network::DFS() {
 }
 
 void Network::DFSVisit(Network N, Node u) {
-	u.setVisited(true); //set node visit value to true
+
+  (u).setVisited(true); //set node visit value to true
   //for the nodes adjacent tp the input node
   for(Node v: u.getAdjList()) {
     //if adjacent node hasn't been visited
     if(v.getVisited() == 0) {
-      v.setParent(u); //set parent
       DFSVisit(N, v); //visit node v
     }
   }
-
-
-	//for each of the nodes in the network
-//	for(Node node: N.getNodeVect()) {
-		//for each of the edges in the network
-//		for(Edge edge: N.getEdgeVect()) {
-			//if the edge.source and the node are the same && the edge's.destination node has not been visited, visit
-//			if(edge.getSource() == node.getID() && edge.getDest() NOT VISITED) {
-				//set v.node.parent to u.node and visit
-//				edge_v.setParent(node);
-//				DFSVisit(N, edge_v_node);
-//			}
-//		}
-//	}
 }
 
 
 ///////////Shelby's Stuff///////////////////////////////////////
+/*
 pair Network::modFFA(Network N) {
 	for(Edge e: N.edgeVec) {
 		e.setFlow(0);
 	}
-/*
+
     //returns a pair
     tuple<int, list of edges> Modified_Ford_Fulkerson(Network G) {
         for each edge in E {
@@ -132,12 +94,12 @@ pair Network::modFFA(Network N) {
         }
         return (outputFlow - inputFlow, set of Edges);
     }
- */
+
 
 }
 
 
-/*
+
 StaticAttack(Network N) {
     tuple<int, set> flow;
     flow = modFFA(N);    //this returns not only the maxflow, but also the set of edges in the augmenting paths
@@ -158,14 +120,14 @@ StaticRandomAttack(Network N) {
     }
     return;
 }
-*/
+
 
 void Network::reactiveRandomAttack(Network N) {
 	pair<int, set> flow = modFFA(N);
 	while(flow.first != 0){
 		edge;//= random link in set
 		delete edge;//delete edge from the set
-		flow = modFFA(/*pass in set here?*/);  //make something in FFA that keeps track of the link that has the max flow running through it
+		flow = modFFA(pass in set here?);  //make something in FFA that keeps track of the link that has the max flow running through it
 	}
 	return;
 }
@@ -176,7 +138,7 @@ void Network::reactiveAttack(Network N) {
 
 		//for loop to find the the link with the max flow in the set
 		//flow.second //Edge edgeMaxFlow; // set equal to the link with most flow
-		if (/*multiple edges with same flow pick one with highest capacity*/)
+		if (multiple edges with same flow pick one with highest capacity)
 			//delete edge;
 
 			return;
@@ -186,7 +148,7 @@ void Network::reactiveAttack(Network N) {
 
 }
 
-
+*/
 
 
 

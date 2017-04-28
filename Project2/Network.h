@@ -19,18 +19,17 @@ public:
   Network();
 
   void printNetwork();
-	void modFFA(Network N);
 	void addEdge(Edge e);
 	void addNode(Node n);
-	void DFS();
+	void DFS(Network N);
 	void DFSVisit(Network N, Node node);
 
 	void reactiveAttack(Network G);
 
 	int getEdgeSize() { return nodeVec.size(); }
 
-	vector<Edge> getEdgeVect();
-	vector<Node> getNodeVect();
+	vector<Edge> getEdgeVect(); //these should be sets
+	vector<Node> getNodeVect(); //these should be sets
 
 	/*
 	Shelby's stuff

@@ -9,6 +9,7 @@
 #include "Edge.h"
 #include "Network.h"
 
+void modFFA(Network N);
 
 
 

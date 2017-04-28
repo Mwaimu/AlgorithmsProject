@@ -11,10 +11,10 @@ using namespace std;
 class Node {
 public:
   Node(int i);
-  Node() { ; }
+//  Node() { ; }
 
 	void setID();
-	void setParent(Node p);
+//	void setParent(Node* p);
 	void setVisited(bool v);
 
   int getID() { return id; }
@@ -24,7 +24,7 @@ public:
 private:
   int id;
 	bool visited;
-	Node* parent; //this is somehow going to have to be a pointer
+//	Node* parent; //this is somehow going to have to be a pointer
 	vector<Node> adjList;
 
 };

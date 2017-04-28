@@ -4,12 +4,12 @@
 
 #include "Edge.h"
 
-Edge::Edge() {
-	flow = 0;
-	capacity = (rand() % 20) + 1;
-}
+//Edge::Edge() {
+//	flow = 0;
+//	capacity = (rand() % 20) + 1;
+//}
 
-Edge::Edge(Node s, Node d) {
+Edge::Edge(Node s, Node d) :source(s), dest(d) {
   source = s;
   dest = d;
   flow = 0;
