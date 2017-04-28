@@ -14,16 +14,17 @@ public:
   Node() { ; }
 
 	void setID();
-	void setParent(Node* p);
+	void setParent(Node p);
 	void setVisited(bool v);
 
   int getID() { return id; }
   int getVisited() { return visited; }
+  vector<Node> getAdjList() { return adjList; }
 
 private:
   int id;
 	bool visited;
-	Node* parent;
+	Node parent;
 	vector<Node> adjList;
 
 };

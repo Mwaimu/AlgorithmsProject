@@ -9,6 +9,8 @@
 #include <iostream>
 #include <cstdlib>
 
+#include "Node.h"
+
 
 using namespace std;
 
@@ -16,23 +18,22 @@ using namespace std;
 class Edge {
 public:
   Edge();
-	Edge(int s, int d);
+	Edge(Node s, Node d);
 
   void printEdge();
-	void setSource(int s);
-	void setDest(int d);
+	void setSource(Node s);
+	void setDest(Node d);
 	void setFlow(int f);
-	void setCapacity(int c);
 	void addEdge(int s, int d);
 
-  int getSource() { return source; }
-  int getDest() { return dest; }
+  Node getSource() { return source; }
+  Node getDest() { return dest; }
   int getFlow() { return flow; }
   int getCapacity() { return capacity; }
 
 private:
-  int source;
-  int dest;
+  Node source;
+  Node dest;
   int flow;
   int capacity;
 };

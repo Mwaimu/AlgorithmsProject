@@ -13,7 +13,7 @@ Node::Node() {
 	parent = nullptr;
 }
 
-void Node::setParent(Node* p) {
+void Node::setParent(Node p) {
 	parent = p;
 }
 

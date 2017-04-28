@@ -9,7 +9,7 @@ Edge::Edge() {
 	capacity = (rand() % 20) + 1;
 }
 
-Edge::Edge(int s, int d) {
+Edge::Edge(Node s, Node d) {
   source = s;
   dest = d;
   flow = 0;
@@ -17,15 +17,15 @@ Edge::Edge(int s, int d) {
 }
 
 void Edge::printEdge() {
-  cout << source << "->" << dest;
+  cout << source.getID() << "->" << dest.getID();
   return;
 }
 
-void Edge::setSource(int s) {
+void Edge::setSource(Node s) {
   source = s;
 }
 
-void Edge::setDest(int d) {
+void Edge::setDest(Node d) {
   dest = d;
 }
 
@@ -33,6 +33,3 @@ void Edge::setFlow(int f) {
   flow = f;
 }
 
-void Edge::setCapacity(int c) {
-  capacity = c;
-}

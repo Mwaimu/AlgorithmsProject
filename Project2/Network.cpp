@@ -80,20 +80,30 @@ void Network::DFS() {
 	}
 }
 
-void Network::DFSVisit(Network N, Node node) {
-	node.setVisited(true); //set node visit value to true
+void Network::DFSVisit(Network N, Node u) {
+	u.setVisited(true); //set node visit value to true
+  //for the nodes adjacent tp the input node
+  for(Node v: u.getAdjList()) {
+    //if adjacent node hasn't been visited
+    if(v.getVisited() == 0) {
+      v.setParent(u); //set parent
+      DFSVisit(N, v); //visit node v
+    }
+  }
+
+
 	//for each of the nodes in the network
-	for(Node node: N.getNodeVect()) {
+//	for(Node node: N.getNodeVect()) {
 		//for each of the edges in the network
-		for(Edge edge: N.getEdgeVect()) {
+//		for(Edge edge: N.getEdgeVect()) {
 			//if the edge.source and the node are the same && the edge's.destination node has not been visited, visit
-			if(edge.getSource() == node.getID() && edge.getDest() NOT VISITED) {
+//			if(edge.getSource() == node.getID() && edge.getDest() NOT VISITED) {
 				//set v.node.parent to u.node and visit
-				edge_v.setParent(node);
-				DFSVisit(N, edge_v_node);
-			}
-		}
-	}
+//				edge_v.setParent(node);
+//				DFSVisit(N, edge_v_node);
+//			}
+//		}
+//	}
 }
 
 
