@@ -21,12 +21,12 @@ using namespace std;
 #define OUTPUT "FordFulkersonOutput.txt"		//Output File
 
 //------- Function Definitions -------//
-void maxFlow(int graph[V][V], int s, int t);  //Ford-Fulkerson implementation
+int* maxFlow(int graph[V][V], int s, int t);  //Ford-Fulkerson implementation
 bool findPath(int residual[V][V], int source, int dest, int parent[]); //Finds paths...
 
 
 //Returns max flow from source to dest in given graph
-void maxFlow(int graph[V][V], int source, int dest) {
+int* maxFlow(int graph[V][V], int source, int dest, int path[]) {
   int u, v; //start and finish of edges
   int maxFlow = 0;
   int resCap = 21; //residual capacity, higher than capacity so that any edge will be considered
@@ -38,7 +38,7 @@ void maxFlow(int graph[V][V], int source, int dest) {
     for (v = 0; v < V; v++)
       residual[u][v] = graph[u][v];
 
-  int path[V]; //holds the augmenting path
+//  int path[V]; //holds the augmenting path
 
   while(findPath(residual, source, dest, path)) {
     //for each element in the path, find the "edge" that has the lowest residual capacity
@@ -58,8 +58,11 @@ void maxFlow(int graph[V][V], int source, int dest) {
   }
 
   cout << maxFlow;
+  for(int i = 0; i < V; i++) {
+    cout << path[i] << "  ";
+  }
 
-  return;
+  return path;
 }
 
 //finds paths
