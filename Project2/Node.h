@@ -11,22 +11,19 @@ using namespace std;
 class Node {
 public:
   Node(int i);
-//  Node() { ; }
 
-	void setID();
-//	void setParent(Node* p);
 	void setVisited(bool v);
+  void addAdj(Node node);
 
   int getID() { return id; }
   int getVisited() { return visited; }
+
   vector<Node> getAdjList() { return adjList; }
 
 private:
-  int id;
+  int id; //make source_node's id "-3" and dest_node's id "-4"
 	bool visited;
-//	Node* parent; //this is somehow going to have to be a pointer
 	vector<Node> adjList;
-
 };
 
 

@@ -8,6 +8,8 @@
 #include <vector>
 #include <iostream>
 #include <cstdlib>
+#include <stack>
+
 
 #include "Node.h"
 #include "Edge.h"
@@ -21,12 +23,11 @@ public:
   void printNetwork();
 	void addEdge(Edge e);
 	void addNode(Node n);
-	void DFS(Network N);
-	void DFSVisit(Network N, Node node);
+
+  vector<Node> DFS(Network N);
+	vector<Node> DFSVisit(Network N, Node node, vector<Node> stack);
 
 	void reactiveAttack(Network G);
-
-	int getEdgeSize() { return nodeVec.size(); }
 
 	vector<Edge> getEdgeVect(); //these should be sets
 	vector<Node> getNodeVect(); //these should be sets
@@ -40,11 +41,9 @@ public:
 	void reactiveRandomAttack(Network N);
 	*/
 
-
 private:
   vector<Node> nodeVec;
   vector<Edge> edgeVec;
-
 };
 
 

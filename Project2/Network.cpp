@@ -2,6 +2,7 @@
  * Shelby Luttrell, Ben Simpson, Nathan Welch
  */
 
+
 #include "Network.h"
 
 Network::Network() {
@@ -19,7 +20,8 @@ void Network::printNetwork() {
   cout << "Nodes" << endl;
 	//for every node in the network print the nodes
   for(Node node : nodeVec) {
-    cout << node.getID() << endl;
+    cout << node.getID() << " " << node.getVisited() << endl;
+
   }
 }
 
@@ -41,8 +43,9 @@ vector<Node> Network::getNodeVect() {
 	return nodeVec;
 }
 
-void Network::DFS(Network N) {
+vector<Node> Network::DFS(Network N) {
 	//for each of the nodes in the network, set the parents to null and the visit to false
+  vector<Node> path;
 	for(Node node: N.getNodeVect()) {
 		node.setVisited(false);
 	}
@@ -50,22 +53,33 @@ void Network::DFS(Network N) {
 		if the has not been visited, visit the node
 	for(Node node: N.getNodeVect()) {
 		if(!node.getVisited()) {
-			DFSVisit(N, node); //here node has to be S
+      path.push_back(node);
+			DFSVisit(N, node, path); //here node has to be S
 		}
 	}
+  return path;
 }
 
-void Network::DFSVisit(Network N, Node u) {
-
-  (u).setVisited(true); //set node visit value to true
+vector<Node> Network::DFSVisit(Network N, Node u, vector<Node> path) {
+  u.setVisited(true); //set node visit value to true
   //for the nodes adjacent tp the input node
   for(Node v: u.getAdjList()) {
     //if adjacent node hasn't been visited
-    if(v.getVisited() == 0) {
-      DFSVisit(N, v); //visit node v
+    if(v.getID() == -4) { //if it's dest_node
+      path.push_back(v);
+      return path;
     }
+    if(v.getVisited() == 0) {
+      path.push_back(v);
+      DFSVisit(N, v, path); //visit node v
+    }
+
+    //might need to take the back off of here to not have everything in it...
+
   }
+  return path;
 }
+
 
 
 ///////////Shelby's Stuff///////////////////////////////////////

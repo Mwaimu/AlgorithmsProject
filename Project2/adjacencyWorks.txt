@@ -1,0 +1,86 @@
+/* Algorithms Project 2
+ * Shelby Luttrell, Ben Simpson, Nathan Welch
+ *
+ * Description:
+ * Attacker deletes edge from network. Compare how reactive and static networks are effected
+ */
+
+
+ /* !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!_________________
+
+ changes in node.h
+   void addAdj(Node& node);
+
+ changes in node.cpp
+  void Node::addAdj(Node& node) {
+    adjList.push_back(node);
+  }
+
+ -------------------------------------------------------
+----------------------------------------------------------\
+--------------------------------------------- */
+
+#include <iostream>
+#include <cstdlib>
+#include <ctime>
+#include <fstream>
+#include <typeinfo>
+
+#include "Edge.h"
+#include "Node.h"
+#include "Network.h"
+#include "main.h"
+
+using namespace std;
+
+void printAdjVec(Node node);
+
+int main() {
+  Node n1(1);
+  Node n2(2);
+  Node n3(3);
+  Node n4(4);
+  Node n6(6);
+  Node n7(7);
+
+  Edge e1(n1, n2);
+  Edge e2(n1, n3);
+  Edge e3(n1, n4);
+  Edge e4(n2, n6);
+  Edge e5(n3, n7);
+
+  Network N;
+  N.addNode(n1);
+  N.addNode(n2);
+  N.addNode(n3);
+  N.addNode(n4);
+  N.addNode(n6);
+  N.addNode(n7);
+
+  N.addEdge(e1);
+  N.addEdge(e2);
+  N.addEdge(e3);
+  N.addEdge(e4);
+  N.addEdge(e5);
+
+
+  n1.addAdj(n2);
+
+  n1.addAdj(n3);
+
+  printAdjVec(n1);
+  int pause;
+  cin >> pause;
+
+
+
+
+
+  return 0;
+}
+
+void printAdjVec(Node node) {
+  for(int i = 0; i < node.getAdjList().size(); i++) {
+    cout << node.getAdjList()[i].getID();
+  }
+}
