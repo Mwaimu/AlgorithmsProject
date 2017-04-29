@@ -35,7 +35,7 @@ int main()
 
   int s, t, v1, v2, c;
   if ( ifptr.is_open() )
-  {
+  {f
     ifptr >> s; ifptr >> t;
 
     while( !ifptr.eof() ) ///set graph full of capacities
@@ -83,6 +83,7 @@ void max_flow(int graph[V][V], int s, int t) {
       u = path[v];
       //Bottleneck for augment path
       path_flow = min(path_flow, residual[u][v]);
+
       if(u != s)
         cout << v << " <-(" << residual[u][v] << ")- ";
       else if( v != s)

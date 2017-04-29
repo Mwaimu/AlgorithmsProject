@@ -3,5 +3,5 @@ project(Project2_1)
 
 set(CMAKE_CXX_STANDARD 11)
 
-set(SOURCE_FILES main.cpp)
+set(SOURCE_FILES main.cpp functions.h)
 add_executable(Project2_1 ${SOURCE_FILES})
