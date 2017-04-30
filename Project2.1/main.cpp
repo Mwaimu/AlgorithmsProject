@@ -10,7 +10,6 @@
 #include <limits.h>
 #include <string.h>
 #include <stack>
-
 using namespace std;
 
 ///things to know/remember  and/or NOTES
@@ -50,21 +49,21 @@ bool DFS(int resGraph[V][V], int source, int dest, int parent[], int arr[V][V]) 
   memset(visited, 0, sizeof(visited));
 
   // Create a stack, stack source "node", source parent as "null", source visited
-  stack<int> q;
-  q.push(source);
+  stack<int> stack;
+  stack.push(source);
   visited[source] = true;
   parent[source] = -1;
 
   //while stack not empty
-  while (!q.empty()) {
-    int u = q.top();  //u = next "node" in stack
-    q.pop();
+  while (!stack.empty()) {
+    int u = stack.top();  //u = next "node" in stack
+    stack.pop();
 
     //for each of the "nodes"
     for (int v = 0; v < V; v++) {
       //if it's not visited and there is flow left in the graph
-      if (visited[v] == 0 && resGraph[u][v] > 0) {
-        q.push(v); //push visited "node" to stack
+      if (visited[v] == false && resGraph[u][v] > 0) {
+        stack.push(v); //push visited "node" to stack
         parent[v] = u;
         visited[v] = true;
       }
@@ -78,7 +77,7 @@ bool DFS(int resGraph[V][V], int source, int dest, int parent[], int arr[V][V]) 
   iter++; //increment so the next path is remembered
   cout << endl;
   //if dest is reached, then return true
-  return (visited[dest] == 0);
+  return (visited[dest] == true);
 }
 
 ///---------------------------------------------------------------------------------------------------------------------
@@ -90,25 +89,26 @@ int fordFulkerson(int graph[V][V], int source, int dest, int arr[V][V]) {
   int resGraph[V][V]; //residual graph, resGraph[i][j] is resCap of edge(i, j) -> 0 means no edge
   int parent[V]; //stores path
   int maxFlow = 0;
-  int resCap = 21; //residual capacity -> init higher that capacities to make any capacity possible resCap
 
   //set resGraph == graph -> when the path becomes zero, no more flow available
-  for (u = 0; u < V; u++) {
-    for (v = 0; v < V; v++) {
+  for(u = 0; u < V; u++) {
+    for(v = 0; v < V; v++) {
       resGraph[u][v] = graph[u][v];
     }
   }
 
   //while flow, find augmenting paths
-  while (DFS(resGraph, source, dest, parent, arr)) {
+  while(DFS(resGraph, source, dest, parent, arr)) {
+    int resCap = 21; //residual capacity -> init higher that capacities to make any capacity possible resCap
+
     //find min resCap of edges along found path
-    for (v=dest; v!=source; v=parent[v]) {
+    for (v = dest; v != source; v = parent[v]) {
       u = parent[v];
       resCap = min(resCap, resGraph[u][v]);
     }
 
     //update flow along path found
-    for (v=dest; v != source; v=parent[v]) {
+    for (v = dest; v != source; v = parent[v]) {
       u = parent[v];
       resGraph[u][v] -= resCap;
       resGraph[v][u] += resCap;
@@ -131,12 +131,12 @@ int main() {
   //TODO: this will obviously have to be changed
 
   //keeps track of capacity at edge(i, j)
-  int graph[V][V] = { {0, 16, 13,  0,  0,  0},
-                      {0,  0, 10, 12,  0,  0},
-                      {0,  4,  0,  0, 14,  0},
-                      {0,  0,  9,  0,  0, 20},
-                      {0,  0,  0,  7,  0,  4},
-                      {0,  0,  0,  0,  0,  0}   };
+  int graph[V][V] = { {0, 16, 13, 0, 0, 0},
+                      {0, 0, 10, 12, 0, 0},
+                      {0, 4, 0, 0, 14, 0},
+                      {0, 0, 9, 0, 0, 20},
+                      {0, 0, 0, 7, 0, 4},
+                      {0, 0, 0, 0, 0, 0}   };
 
   /* TODO: could change to maybe...
    * cin >> node1 >> node2;
