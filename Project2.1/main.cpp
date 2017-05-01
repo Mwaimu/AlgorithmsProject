@@ -11,6 +11,7 @@
 #include <string.h>
 #include <stack>
 #include <cstdlib>
+#include "functions.h"
 
 using namespace std;
 
@@ -225,6 +226,9 @@ void ReactiveAttack(int graph[V][V], int source, int dest, int paths[V][V], int 
   initialMaxFlow = maxFlow;
   cout << roundIterator << " " << maxFlow << endl;
 
+
+
+
   while(maxFlow != 0) {
 //    cout << "Iteration " << roundIterator++ << endl;
     int path = 0; //iterator, keeps track of path currently looking at in paths[][]
@@ -239,7 +243,7 @@ void ReactiveAttack(int graph[V][V], int source, int dest, int paths[V][V], int 
          *
          * graph is comprised of edges that currently exist
          */
-        //is resGraph[][] (flow) is greater than maxEdge (flow) AND edge(u, v) is actually an edge
+        //if resGraph[][] (which is a flow) is greater than maxEdge (flow) AND edge(u, v) is actually an edge
         //TODO: changed this to accommodate the idea of having negative deleted nodes ----- this is what it WAS
 //        if(resGraph[v][u] > maxEdge && graph[u][v] != 0) {
         //TODO: changed this to accommodate the idea of having negative deleted nodes ----- this is what it IS
@@ -247,6 +251,7 @@ void ReactiveAttack(int graph[V][V], int source, int dest, int paths[V][V], int 
           maxEdge = resGraph[v][u]; //update maxEdge
           delEdge[0] = u; //update deleted edge
           delEdge[1] = v;
+          cout << "MAXEDGE: " << maxEdge << "   u: " << delEdge[0] << "   v: " << delEdge[1] << endl;
         }
       }
     }
@@ -309,6 +314,14 @@ void ReactiveAttack(int graph[V][V], int source, int dest, int paths[V][V], int 
       path++;
     }
     cout << ++roundIterator << " " << maxFlow << " " << (maxFlow*2)/initialMaxFlow << endl;
+
+
+    //have to rest paths. Only need to reset first element because rest will get written over
+    for(int first = 0; first < V; first++) {
+      paths[first][0] = 0;
+    }
+    maxFlow = fordFulkerson(graph, source, dest, paths, resGraph, parent, resFlow);    //this returns not only the maxflow, but also the set of edges in the augmenting paths
+
   }
 
   return;
@@ -316,6 +329,7 @@ void ReactiveAttack(int graph[V][V], int source, int dest, int paths[V][V], int 
 
 ///---------------------------------------------------------------------------------------------------------------------
 ///---------------------------------------------------------------------------------------------------------------------
+
 
 int main() {
   int paths[V][V] = {}; //keeps track of residual paths
@@ -339,50 +353,50 @@ int main() {
    */
 
 
-  StaticAttack(graph, source, dest, paths, resGraph);
-cout << endl;
-/* for the variable k node stuff
- *    wipe the graph's source and destination columns/rows
- *    assign k random capacities (1->20)
- *    then run the graph repeating for 30 -> 60 iterations
-*/
+//  StaticAttack(graph, source, dest, paths, resGraph);
+//cout << endl;
+///* for the variable k node stuff
+// *    wipe the graph's source and destination columns/rows
+// *    assign k random capacities (1->20)
+// *    then run the graph repeating for 30 -> 60 iterations
+//*/
+//
+//  int numIters = 30;
+//  for(int round = 0; round < numIters; round++) {
+//    //make all the deleted nodes positive again
+//    //  (they were made negative instead of deleting entirely as not to loose information)
+//    for(int u = 0; u < V; u++) {
+//      for(int v = 0; v < v; v++) {
+//        if(graph[u][v] > 0)
+//          graph[u][v] = -graph[u][v];
+//      }
+//    }
+//
+//    for(int i = 0; i < V; i++) {
+//      //wipe the source row
+//      graph[source][i] = 0;
+//      //wipe dest column
+//      graph[i][dest] = 0;
+//    }
+//
+//    //make k random connections to the source
+//    for(int k = (round +30); k < numIters; k++) {
+//      graph[source][(rand()% V) - 2] = (rand() % 20) + 1;
+//    }
+//    //make k random connections to the source
+//    for(int k = (round +30); k < numIters; k++) {
+//      graph[(rand()% V) - 2][dest] = (rand() % 20) + 1;
+//    }
+//
+//    //TODO: this is a problem because we have deleted a bunch of nodes and have no way of putting them back to rerun
+//    //TODO:    could make the numbers in the graph that have been deleted == -1 and then run through it to make stuff positive again??
+//
+//    StaticAttack(graph, source, dest, paths, resGraph);
+//    cout << endl;
+//
+//  }
 
-  int numIters = 30;
-  for(int round = 0; round < numIters; round++) {
-    //make all the deleted nodes positive again
-    //  (they were made negative instead of deleting entirely as not to loose information)
-    for(int u = 0; u < V; u++) {
-      for(int v = 0; v < v; v++) {
-        if(graph[u][v] > 0)
-          graph[u][v] = -graph[u][v];
-      }
-    }
-
-    for(int i = 0; i < V; i++) {
-      //wipe the source row
-      graph[source][i] = 0;
-      //wipe dest column
-      graph[i][dest] = 0;
-    }
-
-    //make k random connections to the source
-    for(int k = (round +30); k < numIters; k++) {
-      graph[source][(rand()% V) - 2] = (rand() % 20) + 1;
-    }
-    //make k random connections to the source
-    for(int k = (round +30); k < numIters; k++) {
-      graph[(rand()% V) - 2][dest] = (rand() % 20) + 1;
-    }
-
-    //TODO: this is a problem because we have deleted a bunch of nodes and have no way of putting them back to rerun
-    //TODO:    could make the numbers in the graph that have been deleted == -1 and then run through it to make stuff positive again??
-
-    StaticAttack(graph, source, dest, paths, resGraph);
-    cout << endl;
-
-  }
-
-
+  ReactiveAttack(graph, source, dest, paths, resGraph);
 
   return 0;
 }
