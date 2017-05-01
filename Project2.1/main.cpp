@@ -10,6 +10,8 @@
 #include <limits.h>
 #include <string.h>
 #include <stack>
+#include <cstdlib>
+
 using namespace std;
 
 
@@ -103,35 +105,39 @@ int fordFulkerson(int graph[V][V], int source, int dest, int paths[V][V], int re
 
 void StaticAttack(int graph[V][V], int source, int dest, int paths[V][V], int resGraph[V][V]) {
   int maxFlow = 0; //the max flow of the graph
+  int initialMaxFlow;
   int delEdge[2]; //delEdge[0] is 'u' of the edge that is to be deleted
                   //delEdge[1] is 'v' of the edge that is to be deleted
   int parent[V]; //stores paths
   int resFlow[V] = {}; //stores the residual capacities of found paths
+  int roundIterator = 0;
 
 
   //run FFA on graph
   maxFlow = fordFulkerson(graph, source, dest, paths, resGraph, parent, resFlow);    //this returns not only the maxflow, but also the set of edges in the augmenting paths
-  cout << "max flow is: " << maxFlow << endl;
-  
-  int roundIterator = 0;
+  initialMaxFlow = maxFlow;
+  cout << roundIterator << " " << maxFlow << endl;
+
   while(maxFlow != 0) {
-    cout << "Iteration " << roundIterator++ << endl;
+//    cout << "Iteration " << roundIterator++ << endl;
     int path = 0; //iterator, keeps track of path currently looking at in paths[][]
     int v; //destination of an edge
     int maxEdge = 0;  //maximum flow going through paths from source to dest
 
     //finding the edge (in residual Graph) that has the most flow going through it
-    for(int u = 0; u < V; u++) {
-      for(int v = 0; v < V; v++) {
+    for(int u = 0; u < V-2; u++) {
+      for(int v = 0; v < V-2; v++) {
         /* resGraph[v][u] (notice u, v positioning) is the amount of flow that if edge(u, v) is traversed could be
          * added to the maximum flow of the graph
          *
          * graph is comprised of edges that currently exist
          */
         //is resGraph[][] (flow) is greater than maxEdge (flow) AND edge(u, v) is actually an edge
-        if(resGraph[v][u] > maxEdge && graph[u][v] != 0) {
+        //TODO: changed this to accommodate the idea of having negative deleted nodes ----- this is what it WAS
+//        if(resGraph[v][u] > maxEdge && graph[u][v] != 0) {
+        //TODO: changed this to accommodate the idea of having negative deleted nodes ----- this is what it IS
+        if(resGraph[v][u] > maxEdge && graph[u][v] > 0) {
           maxEdge = resGraph[v][u]; //update maxEdge
-          cout << "  MaxEdge: " << maxEdge << "  u: " << u << "  v: " << v << endl;
           delEdge[0] = u; //update deleted edge
           delEdge[1] = v;
         }
@@ -141,7 +147,10 @@ void StaticAttack(int graph[V][V], int source, int dest, int paths[V][V], int re
     maxFlow = maxFlow - maxEdge;
 
     //delete maxEdge from the graphs
-    graph[delEdge[0]][delEdge[1]] = 0;
+    //TODO: changed this to accommodate the idea of having negative deleted nodes ----- this is what it WAS
+//    graph[delEdge[0]][delEdge[1]] = graph[delEdge[0]][delEdge[1]];
+    //TODO: changed this to accommodate the idea of having negative deleted nodes ----- this is what it IS
+    graph[delEdge[0]][delEdge[1]] = -graph[delEdge[0]][delEdge[1]];
     resGraph[delEdge[1]][delEdge[0]] = 0;
     resGraph[delEdge[0]][delEdge[1]] = 0;
 
@@ -153,20 +162,19 @@ void StaticAttack(int graph[V][V], int source, int dest, int paths[V][V], int re
      */
 
     //while the first element in an paths[path][] is not zero
-    while(paths[path][0] == -1 || paths[path][0] == -2 || paths[path][0] == -3) {
+    while(paths[path][source] == -1 || paths[path][source] == -2 || paths[path][source] == -3) {
       v =  dest;
       //if the first element is -1
-      if(paths[path][0] == -1) {
+      if(paths[path][source] == -1) {
         //update 'v' until you find delete_edge's_end (delEdge[1]) OR you hit a -1 in the path meaning
         // it's at the beginning -> edge looking for is not in path
         while(v != delEdge[1] && v != (-1)) {
-          cout << "this is where it starts" << paths[path][v] << endl;
           v = paths[path][v]; //set v to the parent of v
         }
         //for the edge found above -> edge_above,  if start of edge_above is equal to the start of
         //  edge_to_be_deleted    flag it as -2 so we know it needs to have flow recalculated
         if(paths[path][v] == delEdge[0]) {
-          paths[path][0] = -2;
+          paths[path][source] = -2;
         }
       }
       path++;
@@ -174,9 +182,9 @@ void StaticAttack(int graph[V][V], int source, int dest, int paths[V][V], int re
 
     path = 0; //start back at the beginning of paths[][]
     //for each of the paths that start with a -2, we have to reduce the elements in the residual graph by the lowest in the
-    while(paths[path][0] == -1 || paths[path][0] == -2 || paths[path][0] == -3) { //If it ever equals zero, no more paths exist
+    while(paths[path][source] == -1 || paths[path][source] == -2 || paths[path][source] == -3) { //If it ever equals zero, no more paths exist
       //if path has been marked as "needs to be recalculated"
-      if(paths[path][0] == -2) {
+      if(paths[path][source] == -2) {
         //update flow along path found
         int u;
         //run through the path from finish to start
@@ -189,14 +197,120 @@ void StaticAttack(int graph[V][V], int source, int dest, int paths[V][V], int re
           }
         }
         //means the residual capacity has been taken out of deleted path and can be skipped
-        paths[path][0] = -3;
+        paths[path][source] = -3;
       }
       path++;
     }
-    cout << "  End of iteration flow: " << maxFlow << endl;
+    cout << ++roundIterator << " " << maxFlow << " " << (maxFlow*2)/initialMaxFlow << endl;
   }
 
-  cout << "max flow at end is: " << maxFlow << endl;
+  return;
+}
+
+///---------------------------------------------------------------------------------------------------------------------
+///---------------------------------------------------------------------------------------------------------------------
+
+void ReactiveAttack(int graph[V][V], int source, int dest, int paths[V][V], int resGraph[V][V]) {
+  int maxFlow = 0; //the max flow of the graph
+  int initialMaxFlow;
+  int delEdge[2]; //delEdge[0] is 'u' of the edge that is to be deleted
+  //delEdge[1] is 'v' of the edge that is to be deleted
+  int parent[V]; //stores paths
+  int resFlow[V] = {}; //stores the residual capacities of found paths
+  int roundIterator = 0;
+
+
+  //run FFA on graph
+  maxFlow = fordFulkerson(graph, source, dest, paths, resGraph, parent, resFlow);    //this returns not only the maxflow, but also the set of edges in the augmenting paths
+  initialMaxFlow = maxFlow;
+  cout << roundIterator << " " << maxFlow << endl;
+
+  while(maxFlow != 0) {
+//    cout << "Iteration " << roundIterator++ << endl;
+    int path = 0; //iterator, keeps track of path currently looking at in paths[][]
+    int v; //destination of an edge
+    int maxEdge = 0;  //maximum flow going through paths from source to dest
+
+    //finding the edge (in residual Graph) that has the most flow going through it
+    for(int u = 0; u < V-2; u++) {
+      for(int v = 0; v < V-2; v++) {
+        /* resGraph[v][u] (notice u, v positioning) is the amount of flow that if edge(u, v) is traversed could be
+         * added to the maximum flow of the graph
+         *
+         * graph is comprised of edges that currently exist
+         */
+        //is resGraph[][] (flow) is greater than maxEdge (flow) AND edge(u, v) is actually an edge
+        //TODO: changed this to accommodate the idea of having negative deleted nodes ----- this is what it WAS
+//        if(resGraph[v][u] > maxEdge && graph[u][v] != 0) {
+        //TODO: changed this to accommodate the idea of having negative deleted nodes ----- this is what it IS
+        if(resGraph[v][u] > maxEdge && graph[u][v] > 0) {
+          maxEdge = resGraph[v][u]; //update maxEdge
+          delEdge[0] = u; //update deleted edge
+          delEdge[1] = v;
+        }
+      }
+    }
+    //update maxFlow
+    maxFlow = maxFlow - maxEdge;
+
+    //delete maxEdge from the graphs
+    //TODO: changed this to accommodate the idea of having negative deleted nodes ----- this is what it WAS
+//    graph[delEdge[0]][delEdge[1]] = graph[delEdge[0]][delEdge[1]];
+    //TODO: changed this to accommodate the idea of having negative deleted nodes ----- this is what it IS
+    graph[delEdge[0]][delEdge[1]] = -graph[delEdge[0]][delEdge[1]];
+    resGraph[delEdge[1]][delEdge[0]] = 0;
+    resGraph[delEdge[0]][delEdge[1]] = 0;
+
+    /* the first element is paths[path] is only zero when there are no more paths found by DFS
+     * so we know that anything other than zero will either:
+     *    -1 -> path to be considered at a later iteration
+     *    -2 -> path with an edge that was deleted who's flow needs to be recalculated
+     *    -3 -> path who has been deleted and who's flow has been recalculated
+     */
+
+    //while the first element in an paths[path][] is not zero
+    while(paths[path][source] == -1 || paths[path][source] == -2 || paths[path][source] == -3) {
+      v =  dest;
+      //if the first element is -1
+      if(paths[path][source] == -1) {
+        //update 'v' until you find delete_edge's_end (delEdge[1]) OR you hit a -1 in the path meaning
+        // it's at the beginning -> edge looking for is not in path
+        while(v != delEdge[1] && v != (-1)) {
+          v = paths[path][v]; //set v to the parent of v
+        }
+        //for the edge found above -> edge_above,  if start of edge_above is equal to the start of
+        //  edge_to_be_deleted    flag it as -2 so we know it needs to have flow recalculated
+        if(paths[path][v] == delEdge[0]) {
+          paths[path][source] = -2;
+        }
+      }
+      path++;
+    }
+
+    path = 0; //start back at the beginning of paths[][]
+    //for each of the paths that start with a -2, we have to reduce the elements in the residual graph by the lowest in the
+    while(paths[path][source] == -1 || paths[path][source] == -2 || paths[path][source] == -3) { //If it ever equals zero, no more paths exist
+      //if path has been marked as "needs to be recalculated"
+      if(paths[path][source] == -2) {
+        //update flow along path found
+        int u;
+        //run through the path from finish to start
+        //(set v to end; go until v is at the beginning; set v to it's parent)
+        for (v = dest; v != source; v = u) {
+          u = paths[path][v]; //u = the parent of v
+          if(resGraph[u][v] != 0 || resGraph[v][u] != 0) { //doesn't take away a residual capacity from a node that was just deleted
+            resGraph[u][v] = resGraph[u][v] + resFlow[path];
+            resGraph[v][u] = resGraph[v][u] - resFlow[path];
+          }
+        }
+        //means the residual capacity has been taken out of deleted path and can be skipped
+        paths[path][source] = -3;
+      }
+      path++;
+    }
+    cout << ++roundIterator << " " << maxFlow << " " << (maxFlow*2)/initialMaxFlow << endl;
+  }
+
   return;
 }
 
@@ -206,19 +320,17 @@ void StaticAttack(int graph[V][V], int source, int dest, int paths[V][V], int re
 int main() {
   int paths[V][V] = {}; //keeps track of residual paths
   // Let us create a graph shown in the above example
-  int source = 0; //source node
+  int source = 4; //source node
   int dest = 5;   //destination node
   int resGraph[V][V] = {};  //graph of residual flow
 
-
   //TODO: this will obviously have to be changed
-
   //keeps track of capacity at edge(i, j)
-  int graph[V][V] = { {0, 16, 13, 0, 0, 0},
-                      {0, 0, 0, 12, 0, 0},
-                      {0, 4, 0, 0, 14, 0},
+  int graph[V][V] = { {0, 0, 0, 7, 0, 4},   //THIS GRAPH HAS BEEN REFLECTED TO PUT THE SOURCE AND DESTINATION AT THE
+                      {0, 0, 4, 12, 0, 0},  //LAST 2 POSITIONS OF THE GRAPH. THE CODE ALSO REFLECTS IT AND IT
+                      {14, 0, 0, 0, 0, 0},  //WORKS JUST FINE
                       {0, 0, 9, 0, 0, 20},
-                      {0, 0, 0, 7, 0, 4},
+                      {0, 16, 13, 0, 0, 0},
                       {0, 0, 0, 0, 0, 0}   };
 
   /* TODO: could change to maybe...
@@ -228,15 +340,48 @@ int main() {
 
 
   StaticAttack(graph, source, dest, paths, resGraph);
+cout << endl;
+/* for the variable k node stuff
+ *    wipe the graph's source and destination columns/rows
+ *    assign k random capacities (1->20)
+ *    then run the graph repeating for 30 -> 60 iterations
+*/
 
-  cout << "Out of StaticAttack()" << endl;
-  //just prints the graph
-  for(int u = 0; u < V; u++) {
-    for(int v = 0; v < V; v++) {
-      cout << resGraph[u][v] << " ";
+  int numIters = 30;
+  for(int round = 0; round < numIters; round++) {
+    //make all the deleted nodes positive again
+    //  (they were made negative instead of deleting entirely as not to loose information)
+    for(int u = 0; u < V; u++) {
+      for(int v = 0; v < v; v++) {
+        if(graph[u][v] > 0)
+          graph[u][v] = -graph[u][v];
+      }
     }
+
+    for(int i = 0; i < V; i++) {
+      //wipe the source row
+      graph[source][i] = 0;
+      //wipe dest column
+      graph[i][dest] = 0;
+    }
+
+    //make k random connections to the source
+    for(int k = (round +30); k < numIters; k++) {
+      graph[source][(rand()% V) - 2] = (rand() % 20) + 1;
+    }
+    //make k random connections to the source
+    for(int k = (round +30); k < numIters; k++) {
+      graph[(rand()% V) - 2][dest] = (rand() % 20) + 1;
+    }
+
+    //TODO: this is a problem because we have deleted a bunch of nodes and have no way of putting them back to rerun
+    //TODO:    could make the numbers in the graph that have been deleted == -1 and then run through it to make stuff positive again??
+
+    StaticAttack(graph, source, dest, paths, resGraph);
     cout << endl;
-  } cout << endl;
+
+  }
+
 
 
   return 0;
