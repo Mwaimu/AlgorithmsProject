@@ -11,14 +11,13 @@
 #include <string.h>
 #include <stack>
 #include <cstdlib>
-#include "functions.h"
 
 using namespace std;
 
 
 //TODO: if we use this its going to have to be much larger than 6...
 // Number of vertices in given graph
-#define V 6
+#define V 13
 
 /* returns true if path fom source to dest in residual graph.
  * parent keeps track of the path
@@ -65,6 +64,7 @@ bool DFS(int resGraph[V][V], int source, int dest, int parent[], int paths[V][V]
 
 //returns maxFlow, also (by reference) creates and keeps track of resPaths
 int fordFulkerson(int graph[V][V], int source, int dest, int paths[V][V], int resGraph[V][V], int parent[V], int resFlow[V]) {
+  cout << "Entered FFA" << endl;
   int u, v;
 //  int resGraph[V][V]; //residual graph, resGraph[i][j] is resCap of edge(i, j) -> 0 means no edge
   int maxFlow = 0;
@@ -125,9 +125,18 @@ void StaticAttack(int graph[V][V], int source, int dest, int paths[V][V], int re
     int v; //destination of an edge
     int maxEdge = 0;  //maximum flow going through paths from source to dest
 
+
+    for(int first = 0; first < V; first++) {
+      for (int second = 0; second < V; second++) {
+        cout << paths[first][second] << "  ";
+      }
+      cout << endl;
+    }      cout << endl;
+
+
     //finding the edge (in residual Graph) that has the most flow going through it
-    for(int u = 0; u < V-2; u++) {
-      for(int v = 0; v < V-2; v++) {
+    for(int u = 0; u < V - 2; u++) {
+      for(int v = 0; v < V - 2; v++) {
         /* resGraph[v][u] (notice u, v positioning) is the amount of flow that if edge(u, v) is traversed could be
          * added to the maximum flow of the graph
          *
@@ -141,6 +150,7 @@ void StaticAttack(int graph[V][V], int source, int dest, int paths[V][V], int re
           maxEdge = resGraph[v][u]; //update maxEdge
           delEdge[0] = u; //update deleted edge
           delEdge[1] = v;
+          cout << "MAXEDGE: " << maxEdge << "   u: " << delEdge[0] << "   v: " << delEdge[1] << endl;
         }
       }
     }
@@ -215,7 +225,7 @@ void ReactiveAttack(int graph[V][V], int source, int dest, int paths[V][V], int 
   int maxFlow = 0; //the max flow of the graph
   int initialMaxFlow;
   int delEdge[2]; //delEdge[0] is 'u' of the edge that is to be deleted
-  //delEdge[1] is 'v' of the edge that is to be deleted
+                  //delEdge[1] is 'v' of the edge that is to be deleted
   int parent[V]; //stores paths
   int resFlow[V] = {}; //stores the residual capacities of found paths
   int roundIterator = 0;
@@ -228,12 +238,24 @@ void ReactiveAttack(int graph[V][V], int source, int dest, int paths[V][V], int 
 
 
 
-
+    int ROUND_IT_IS = 0;
   while(maxFlow != 0) {
+    cout << "\nROUND IT IS:  " << ROUND_IT_IS << endl;
+    ROUND_IT_IS++;
+
 //    cout << "Iteration " << roundIterator++ << endl;
     int path = 0; //iterator, keeps track of path currently looking at in paths[][]
     int v; //destination of an edge
     int maxEdge = 0;  //maximum flow going through paths from source to dest
+
+    for(int first = 0; first < V; first++) {
+      for (int second = 0; second < V; second++) {
+        cout << paths[first][second] << "  ";
+      }
+      cout << "   resCap: " << resFlow[first];
+      cout << endl;
+    }      cout << endl;
+
 
     //finding the edge (in residual Graph) that has the most flow going through it
     for(int u = 0; u < V-2; u++) {
@@ -251,12 +273,13 @@ void ReactiveAttack(int graph[V][V], int source, int dest, int paths[V][V], int 
           maxEdge = resGraph[v][u]; //update maxEdge
           delEdge[0] = u; //update deleted edge
           delEdge[1] = v;
-          cout << "MAXEDGE: " << maxEdge << "   u: " << delEdge[0] << "   v: " << delEdge[1] << endl;
+          cout << "  MAXEDGE: " << maxEdge << "   u: " << delEdge[0] << "   v: " << delEdge[1] << endl;
         }
       }
     }
     //update maxFlow
     maxFlow = maxFlow - maxEdge;
+    cout << "  Deleted Edge:   (" << delEdge[0] << ", " << delEdge[1] << ")" << endl;
 
     //delete maxEdge from the graphs
     //TODO: changed this to accommodate the idea of having negative deleted nodes ----- this is what it WAS
@@ -313,17 +336,19 @@ void ReactiveAttack(int graph[V][V], int source, int dest, int paths[V][V], int 
       }
       path++;
     }
-    cout << ++roundIterator << " " << maxFlow << " " << (maxFlow*2)/initialMaxFlow << endl;
-
+    cout << "  maxFlow: " << maxFlow << "   50%: " << (maxFlow*2)/initialMaxFlow << endl;
+    roundIterator++;
 
     //have to rest paths. Only need to reset first element because rest will get written over
     for(int first = 0; first < V; first++) {
       paths[first][0] = 0;
     }
+
+    //clear path
+    paths[V][V] = {};
     maxFlow = fordFulkerson(graph, source, dest, paths, resGraph, parent, resFlow);    //this returns not only the maxflow, but also the set of edges in the augmenting paths
 
   }
-
   return;
 }
 
@@ -334,27 +359,43 @@ void ReactiveAttack(int graph[V][V], int source, int dest, int paths[V][V], int 
 int main() {
   int paths[V][V] = {}; //keeps track of residual paths
   // Let us create a graph shown in the above example
-  int source = 4; //source node
-  int dest = 5;   //destination node
+  int source = V-2; //source node
+  int dest = V-1;   //destination node
   int resGraph[V][V] = {};  //graph of residual flow
-
+  int graph[V][V];
   //TODO: this will obviously have to be changed
-  //keeps track of capacity at edge(i, j)
-  int graph[V][V] = { {0, 0, 0, 7, 0, 4},   //THIS GRAPH HAS BEEN REFLECTED TO PUT THE SOURCE AND DESTINATION AT THE
-                      {0, 0, 4, 12, 0, 0},  //LAST 2 POSITIONS OF THE GRAPH. THE CODE ALSO REFLECTS IT AND IT
-                      {14, 0, 0, 0, 0, 0},  //WORKS JUST FINE
-                      {0, 0, 9, 0, 0, 20},
-                      {0, 16, 13, 0, 0, 0},
-                      {0, 0, 0, 0, 0, 0}   };
+//  //keeps track of capacity at edge(i, j)
+//  int graph[V][V] = { { 0,  0,  5,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0},   //THIS GRAPH HAS BEEN REFLECTED TO PUT THE SOURCE AND DESTINATION AT THE
+//                      { 0,  0,  8,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0},  //LAST 2 POSITIONS OF THE GRAPH. THE CODE ALSO REFLECTS IT AND IT
+//                      { 0,  0,  0,  0, 12,  4,  0,  0,  0,  0,  0,  0,  0},  //WORKS JUST FINE
+//                      { 0,  0,  0,  0, 15,  0,  0,  0,  0,  0,  0,  0,  0},
+//                      { 0,  0,  0,  0,  0,  0,  9,  0,  0,  0,  0,  0,  0},
+//                      { 0,  0,  0,  0,  0,  0,  0,  0,  7,  0,  0,  0,  0},
+//                      { 0,  0,  0,  0,  0,  0,  0, 13,  0,  0,  0,  0,  0},
+//                      { 0,  0,  0,  0,  0,  0,  0,  0,  8, 14,  0,  0,  0},
+//                      { 0,  0,  0,  0,  0,  0,  0,  0,  0,  6,  0,  0,  0},
+//                      { 0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  9,  0, 20},
+//                      { 0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0, 20},
+//                      {20, 20,  0, 20,  0,  0,  0,  0,  0,  0,  0,  0,  0},
+//                      { 0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0},
+//  };
 
-  /* TODO: could change to maybe...
-   * cin >> node1 >> node2;
-   * graph[node1][node2] = rand % 20 + 1; //random number between 1 and 20
-   */
+//   TODO: could change to maybe...
+  int node1, node2;
+  cin >> node1 >> node2;
+  while(node1 != -1) {
+    graph[node1][node2] = (rand() % 20) + 1; //random number between 1 and 20
+    cin >> node1 >> node2;
+  }
 
 
+
+//  cout << "Enter StaticAttack" << endl;
 //  StaticAttack(graph, source, dest, paths, resGraph);
-//cout << endl;
+//  cout << endl;
+
+
+
 ///* for the variable k node stuff
 // *    wipe the graph's source and destination columns/rows
 // *    assign k random capacities (1->20)
@@ -363,14 +404,18 @@ int main() {
 //
 //  int numIters = 30;
 //  for(int round = 0; round < numIters; round++) {
-//    //make all the deleted nodes positive again
-//    //  (they were made negative instead of deleting entirely as not to loose information)
-//    for(int u = 0; u < V; u++) {
-//      for(int v = 0; v < v; v++) {
-//        if(graph[u][v] > 0)
-//          graph[u][v] = -graph[u][v];
-//      }
-//    }
+    //make all the deleted nodes positive again
+    //  (they were made negative instead of deleting entirely as not to loose information)
+//    cout << "print graph " << endl;
+    for(int u = 0; u < V; u++) {
+      for(int v = 0; v < V; v++) {
+        if(graph[u][v] < 0)
+          graph[u][v] = -graph[u][v];
+//        cout << graph[u][v] << " ";
+      }
+//      cout << endl;
+    }
+  cout << endl;
 //
 //    for(int i = 0; i < V; i++) {
 //      //wipe the source row
@@ -395,7 +440,7 @@ int main() {
 //    cout << endl;
 //
 //  }
-
+  cout << "Enter ReactiveAttack" << endl;
   ReactiveAttack(graph, source, dest, paths, resGraph);
 
   return 0;
