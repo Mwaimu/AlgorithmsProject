@@ -6,6 +6,25 @@
  *  recalculate maxFlow after each attack.
  */
 
+
+
+
+/////////////////////////////////////////////////
+//static is working an a thing for the graphs we have to do has been implemented
+//this can be deleted I just wanted to make sure you saw it
+//reactive has been started. Still need to check for
+        //if multiple edges with same flow
+        //  pick one that has the highest capacity (the one that has the higher value in graph[][]
+/////////////////////////////////////////////////
+
+
+
+
+
+
+
+
+
 #include <iostream>
 #include <limits.h>
 #include <string.h>
