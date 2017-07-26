@@ -25,6 +25,7 @@
 using namespace std;
 
 int main() {
+  srand(time(NULL));
 
   int totalCoverage = 0;
   vector<Point> pointVect;
@@ -34,35 +35,35 @@ int main() {
 //    S.push_back(Sensor(i, i));
 //  }
 
-
-  S.emplace_back(Sensor(8, 11));
-
-  S.emplace_back(Sensor(11, 5));
-
-  S.emplace_back(Sensor(5, 5));
-
-  S.emplace_back(Sensor(20, 5));
-
-
+  int randX;
+  int randY;
+  for(int i = 0; i < NUM_SENSORS; i++) {
+    randX = rand() % 14;
+    randY = rand() % 14;
+    S.emplace_back(Sensor(randX, randY));
+  }
 
   St = S;
 
-  cout << "Size of St: " << St.size() << "  energy: " << ENERGY_START << endl;
+//  cout << "Size of St: " << St.size() << "  energy: " << ENERGY_START << endl;
 
   //figure out the coverage and IPs of original set S
   totalCoverage = coverage(S);
 
-  cout << "testing calcIP" << endl;
+//  cout << "testing calcIP" << endl;
   pointVect = calcIP(St);
 
 //  cout << "Size of pointVect: " << pointVect.size() << endl;
 
-  for (auto i : pointVect) {
-    i.outputPoint();
-//     use first and second
-  }
+//  cout << endl;
+//  for (auto i : pointVect) {
+//    i.outputPoint();
+//  }
 
   //allActive(S, totalCoverage);
+
+  cout << "Bottom up" << endl;
+  bottomUp(St, pointVect, totalCoverage);
 
 
   return 0;

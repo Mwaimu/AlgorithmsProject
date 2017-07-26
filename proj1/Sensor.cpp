@@ -8,17 +8,17 @@ Sensor::Sensor(int X, int Y) {
   x = X;
   y = Y;
   energy = ENERGY_START;
-  status = false;
+  active = false;
 };
 
 void Sensor::setEnergy(int e) {
   energy = e;
 }
 
-void Sensor::setSensor(bool stat) {
-  status = stat;
+void Sensor::setActive(bool stat) {
+  active = stat;
 }
 
 void Sensor::outputSensor() {
-  cout << "(" << x << ", " << y << ")    " << status << endl;
+  cout << "(" << x << ", " << y << ")    " << active << endl;
 }

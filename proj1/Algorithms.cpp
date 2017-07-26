@@ -4,6 +4,15 @@
 #include "Algorithms.h"
 #include "Point.h"
 
+//total sensors
+//total energy
+//total coverage
+//for each round
+//sensors alive
+//sensors active
+//round
+//total residual energy
+//coverage at round -> use Montecarlo Approach
 
 
 void allActive(vector<Sensor> St, int totalCoverage) {
@@ -13,7 +22,7 @@ void allActive(vector<Sensor> St, int totalCoverage) {
   int totalResEnergy = 0;  //total residual energy
   vector<Sensor> activeSensors = St;
 
-  while(activeSensors.size() > 0) { //while there are active sensors
+  while(!activeSensors.empty()) { //while there are active sensors
     for(int i = 0; i < activeSensors.size(); i++) { //look at each of the sensors
       if(activeSensors[i].getEnergy() != 0) { //means sensor has power so take away one unit
         activeSensors[i].setEnergy(activeSensors[i].getEnergy() - 1);
@@ -28,57 +37,84 @@ void allActive(vector<Sensor> St, int totalCoverage) {
     round++;
     output(round, activeSensors, activeSensors, totalResEnergy, totalCoverage);
   } //end while
-
-  return;
 }
 
-void bottonUp(vector<Sensor> St, int totalCoverage) {
+void bottomUp(vector<Sensor> St, vector<Point> temp,int totalCoverage) {
   cout << "----" << endl; //marker for file read later on
 
   int round = 0;
-  int totalResEnergy = 0;  //total residual energy
+  int totalResEnergy;  //total residual energy
   vector<Sensor> activeSensors, aliveSensors;
-  aliveSensors = St;
+  vector<Point> pointVect;
+  random_device rd;
+  mt19937 g(rd());
+  aliveSensors.operator=(St);
+  pointVect.operator=(temp);
 
+  activeSensors = {}; //starts empty, sensors added in
+  shuffle(aliveSensors.begin(), aliveSensors.end(), g); //random sort aliveSensors sensors to make iterative process easier.
 
   //activeSensors starts empty at each iteration and sensors are added into it after meeting required criteria
-  while(aliveSensors.size() > 0) {
+  while(!aliveSensors.empty()) {
+    totalResEnergy = 0;  //total residual energy
+    round++;
     activeSensors.clear();  //clears out activeSensors to start clean every time
-    random_shuffle(aliveSensors.begin(), aliveSensors.end());      //random sort St sensors to make iterative process easier.
+    for(int i = 0; i < pointVect.size(); i++) {
+      pointVect[i].setCovered(false);
+    }
 
+    shuffle(aliveSensors.begin(), aliveSensors.end(), g);      //random sort St sensors to make iterative process easier.
+
+    for(int i = 0; i < aliveSensors.size(); i++) {  //select "random" sensor to check
+      for(int j = 0; j < pointVect.size(); j++) {
+
+        //if 'alive' covers a point (that hasn't been covered yet) then add it to active sensors
+        if((!pointVect[j].getCovered()) && distBetSP(aliveSensors[i], pointVect[j]) <= RADIUS) {
+          //if the point is inside the radius and has not been looked at yet
+          pointVect[j].setCovered(true);  //set the point to has been checked
+
+          //see if the sensor has been added. If not, add it.
+          if(!aliveSensors[i].getActive()) {
+            aliveSensors[i].setActive(true);  //set sensor to be active
+            activeSensors.emplace_back(aliveSensors[i]);  //add the live sensor to the set of active sensors
+          }
+        } //not covered, don't add
+      } //end for alive
+    } //end for point
+
+    //if alive sensors have no energy, take off list
     for(int i = 0; i < aliveSensors.size(); i++) {
-//      if( canBeAdded() ) {
-//        //add sensor into activeSensors
-//        //decrease power
-//      }
+      if(aliveSensors[i].getActive()) {  //takes one energy away from all the active sensors
+        aliveSensors[i].setEnergy(aliveSensors[i].getEnergy() - 1);
+      }
+      if(aliveSensors[i].getEnergy() == 0) {  //if a sensor has no energy it is removed
+        aliveSensors.erase(aliveSensors.begin() + i);
+      }
+      totalResEnergy += aliveSensors[i].getEnergy();
 
     }
 
+    output(round, activeSensors, aliveSensors, totalResEnergy, totalCoverage);
 
-  }
+    for(int i = 0; i < aliveSensors.size(); i++) {
+      aliveSensors[i].setActive(false);
+    }
 
+    } //end while !alive
 
 }
 
-//total sensors
-//total energy
-//total coverage
-//for each round
-  //sensors alive
-  //sensors active
-  //round
-  //total residual energy
-  //coverage at round -> use Montecarlo Approach
-
 void output(int round, vector<Sensor> activeSensors, vector<Sensor> aliveSensors, int totalResEnergy, int totalCoverage) {
   cout << "Round: " << round <<
-       "  % Alive: " << float(aliveSensors.size()/NUM_SENSORS)*100 <<
-       "  % Active:  " << float(activeSensors.size()/NUM_SENSORS)*100;
-  if(aliveSensors.size() == 0)
+       "  Alive: " << aliveSensors.size()/NUM_SENSORS*100 << "%" <<
+       "  Active:  " << activeSensors.size()/NUM_SENSORS*100 << "%";
+  if(aliveSensors.empty())
     cout << "  AvgResEnergy: 0";
   else
-    cout << "  AvgResEnergy: " << float(totalResEnergy/activeSensors.size());
-  cout << "  % Coverage: " << float(coverage(activeSensors)/totalCoverage)*100 << endl;
+    cout << "  AvgResEnergy: " << float(totalResEnergy)/aliveSensors.size();
+  cout << "  Coverage: " << float(coverage(activeSensors))/totalCoverage*100 << "%   ";
+  cout << aliveSensors.size() << endl;
+
 }
 
 void printVect(vector<Sensor> S) {
@@ -100,7 +136,7 @@ vector<Point> calcIP(vector<Sensor> sensorVect) {
   for(int i = 0; i < sensorVect.size(); i++) {
     for(int j = i; j < sensorVect.size(); j++) {
 
-      if(distBet(sensorVect[i], sensorVect[j]) == 10 && !sensorVect[i].getStatus() && i != j) {
+      if(distBet(sensorVect[i], sensorVect[j]) == 10 && !sensorVect[i].getActive() && i != j) {
         //there is only exactly one point where the circles intersect
         x1 = sensorVect[i].getX(), x2 = sensorVect[j].getX();
         y1 = sensorVect[i].getY(), y2 = sensorVect[j].getY();
@@ -116,7 +152,7 @@ vector<Point> calcIP(vector<Sensor> sensorVect) {
         pointVect.emplace_back(s1);
       }
 
-      if(distBet(sensorVect[i], sensorVect[j]) < 2*RADIUS && !sensorVect[i].getStatus() && i != j) {  // IP in radius of s
+      if(distBet(sensorVect[i], sensorVect[j]) < 2*RADIUS && !sensorVect[i].getActive() && i != j) {  // IP in radius of s
         //calculates intersection point between two sensors
         x1 = sensorVect[i].getX(), x2 = sensorVect[j].getX();
         y1 = sensorVect[i].getY(), y2 = sensorVect[j].getY();
@@ -135,7 +171,7 @@ vector<Point> calcIP(vector<Sensor> sensorVect) {
         pointVect.emplace_back(s2);
       }
     } //second for loop
-    sensorVect[i].setSensor(true);
+    sensorVect[i].setActive(true);
   } //first for loop
   return pointVect;
 }
@@ -143,6 +179,12 @@ vector<Point> calcIP(vector<Sensor> sensorVect) {
 double distBet(Sensor cur, Sensor prev) {
   double x = (cur.getX() - prev.getX());
   double y = (cur.getY() - prev.getY());
+  return sqrt(x*x + y*y);
+}
+
+double distBetSP(Sensor alive, Point point) {
+  double x = (alive.getX() - point.getX());
+  double y = (alive.getY() - point.getY());
   return sqrt(x*x + y*y);
 }
 
@@ -156,9 +198,9 @@ int calcEnergy(vector<Sensor> active) {
 
 int coverage(vector<Sensor> active) {
   //coverage function (coverage provided by sensors in 'At')
-  //use Montecarlo Approach when actually building
   //calculates the coverage of 'St' and 'At' at each iteration comparing the two
 
+  //use Montecarlo Approach when actually building
   int coverage;
   coverage = 2;
   return coverage;

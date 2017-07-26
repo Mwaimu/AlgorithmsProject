@@ -9,6 +9,9 @@
 #include <iostream>
 #include <algorithm>  //random shuffle
 #include <cmath>
+#include <ctime>
+#include <cstdlib>
+
 using namespace std;
 
 #include "Point.h"
@@ -16,7 +19,7 @@ using namespace std;
 
 const int ENERGY_START = 5;
 const int RADIUS = 5;
-const int NUM_SENSORS = 4;  //number of sensors deployed -> 'N'
+const float NUM_SENSORS = 10.0;  //number of sensors deployed -> 'N'
 const int WIDTH = 50;
 
 
@@ -27,17 +30,17 @@ public:
   int getX() { return x; }
   int getY() { return y; }
   int getEnergy() { return energy; }
-  bool getStatus() { return status; }
+  bool getActive() { return active; }
 
   void setEnergy(int e);
-  void setSensor(bool stat);
+  void setActive(bool stat);
 
   void outputSensor();
 
 private:
   int x, y;  //position
   int energy;  //energy level
-  bool status;  //true -> has been looked over
+  bool active;  //true -> has been looked over
 };
 
 

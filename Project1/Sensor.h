@@ -1,7 +1,6 @@
 #ifndef FOLDER_SENSOR_H
 #define FOLDER_SENSOR_H
 
-#include <cstdlib>
 #include <iostream>
 #include <cstdlib>
 #include <vector>

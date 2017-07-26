@@ -10,12 +10,18 @@ class Point {
 private:
   double x;
   double y;
+  bool covered;
 
 public:
   Point();
   Point(double x1, double y1);
   void outputPoint();
   void setCoord(double X, double Y);
+  void setCovered(bool c);
+
+  double getX() { return x; }
+  double getY() { return y; }
+  bool getCovered() { return covered; }
 
 
 };

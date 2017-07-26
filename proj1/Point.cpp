@@ -7,7 +7,9 @@
 #include <iostream>
 using namespace std;
 
-Point::Point() {}
+Point::Point() {
+  covered = 0;
+}
 
 Point::Point(double x1, double y1) {
   x = x1;
@@ -15,10 +17,14 @@ Point::Point(double x1, double y1) {
 }
 
 void Point::outputPoint() {
-  cout << "    (" << x << ", " << y << ")" << endl;
+  cout << "    (" << x << ", " << y << ")  " << covered << endl;
 }
 
 void Point::setCoord(double X, double Y) {
   x = X;
   y = Y;
+}
+
+void Point::setCovered(bool c) {
+  covered = c;
 }
