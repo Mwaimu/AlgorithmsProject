@@ -49,21 +49,16 @@ int main() {
 
   //figure out the coverage and IPs of original set S
   totalCoverage = coverage(S);
-
-//  cout << "testing calcIP" << endl;
+  //calculates the IP's of the given sensors
   pointVect = calcIP(St);
 
-//  cout << "Size of pointVect: " << pointVect.size() << endl;
+//  cout << "All Active   ";
+//  allActive(S, totalCoverage);
+//  cout << "Bottom Up    ";
+//  bottomUp(S, pointVect, totalCoverage);
 
-//  cout << endl;
-//  for (auto i : pointVect) {
-//    i.outputPoint();
-//  }
-
-  //allActive(S, totalCoverage);
-
-  cout << "Bottom up" << endl;
-  bottomUp(St, pointVect, totalCoverage);
+  cout << "Top Down     ";
+  topDown(S, pointVect, totalCoverage);
 
 
   return 0;

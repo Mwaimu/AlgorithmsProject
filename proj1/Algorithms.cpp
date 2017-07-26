@@ -15,12 +15,12 @@
 //coverage at round -> use Montecarlo Approach
 
 
-void allActive(vector<Sensor> St, int totalCoverage) {
+void allActive(vector<Sensor> S, int totalCoverage) {
   cout << "----" << endl; //marker for file read later on
 
   int round = 0;
   int totalResEnergy = 0;  //total residual energy
-  vector<Sensor> activeSensors = St;
+  vector<Sensor> activeSensors = S;
 
   while(!activeSensors.empty()) { //while there are active sensors
     for(int i = 0; i < activeSensors.size(); i++) { //look at each of the sensors
@@ -39,7 +39,7 @@ void allActive(vector<Sensor> St, int totalCoverage) {
   } //end while
 }
 
-void bottomUp(vector<Sensor> St, vector<Point> temp,int totalCoverage) {
+void bottomUp(vector<Sensor> S, vector<Point> temp,int totalCoverage) {
   cout << "----" << endl; //marker for file read later on
 
   int round = 0;
@@ -48,11 +48,10 @@ void bottomUp(vector<Sensor> St, vector<Point> temp,int totalCoverage) {
   vector<Point> pointVect;
   random_device rd;
   mt19937 g(rd());
-  aliveSensors.operator=(St);
+  aliveSensors.operator=(S);
   pointVect.operator=(temp);
 
   activeSensors = {}; //starts empty, sensors added in
-  shuffle(aliveSensors.begin(), aliveSensors.end(), g); //random sort aliveSensors sensors to make iterative process easier.
 
   //activeSensors starts empty at each iteration and sensors are added into it after meeting required criteria
   while(!aliveSensors.empty()) {
@@ -94,13 +93,70 @@ void bottomUp(vector<Sensor> St, vector<Point> temp,int totalCoverage) {
 
     }
 
+    //output data to be collected later
     output(round, activeSensors, aliveSensors, totalResEnergy, totalCoverage);
 
+    //reset active sensors in alive vector
     for(int i = 0; i < aliveSensors.size(); i++) {
       aliveSensors[i].setActive(false);
     }
 
     } //end while !alive
+
+}
+
+void topDown(vector<Sensor> S, vector<Point> temp, int totalCoverage) {
+  cout << "----" << endl; //marker for file read later on
+
+  int round = 0;
+  int totalResEnergy;  //total residual energy
+  vector<Sensor> activeSensors, aliveSensors;
+  vector<Point> pointVect;
+  random_device rd;
+  mt19937 g(rd());
+  aliveSensors.operator=(S);
+  pointVect.operator=(temp);
+
+
+  while(!aliveSensors.empty()) {
+    round++;
+    activeSensors.operator=(aliveSensors); //starts full, then get deleted from
+
+    shuffle(aliveSensors.begin(), aliveSensors.end(), g); //random sort aliveSensors sensors to make random iterative process easier.
+
+    for(int i = 0; i < pointVect.size(); i++) { //resets covered values of the points
+      pointVect[i].setCovered(false);
+    }
+
+    for(int i = 0; i < aliveSensors.size(); i++) {  //select "random" sensor to check
+      for(int j = 0; j < pointVect.size(); j++) {
+
+        //instead of checking if points are covered, we need to see if there are any points that aren't
+
+        //look at the firstSensor
+          //if all the points inside firstSensor radius are covered by another sensor
+            //take out firstSensor
+        //repeat
+
+
+        //for sensors_i
+          //for sensors_j
+            //for points
+              //are all points in sensor_i covered by sensors_j
+                //"setCover" points in sensor_i
+                //remove sensor_i from activeSensors
+
+
+
+
+        } //not covered, don't add
+      } //end for alive
+    } //end for point
+
+
+
+
+  }
 
 }
 
